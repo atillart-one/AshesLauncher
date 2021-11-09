@@ -6,20 +6,20 @@ Summary
 Bug fixes
 
 Kos Parasite 
--Lost version now has a 20 faith requirement instead of 20 int.
+- Lost version now has a 20 faith requirement instead of 20 int.
 
 Gundyr's Halberd
--Fixed model
+- Fixed model
 
 Lothric war scythe
--Fixed a bug that allowed 1H second R2 to hit twice when close
+- Fixed a bug that allowed 1H second R2 to hit twice when close
 
 Bloodlust
--Fixed a bug that allowed 1H second R2 to have no hitboxes
--Fixed Weapon Art descriptions
+- Fixed a bug that allowed 1H second R2 to have no hitboxes
+- Fixed Weapon Art descriptions
 
 Soldering Iron
--Fixed Weapon Art descriptions
+- Fixed Weapon Art descriptions
 
 High Wall and Irithyll Maps
--Fixed texture bugs
+- Fixed texture bugs
