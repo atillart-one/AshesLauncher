@@ -1,8 +1,12 @@
 VERSION 1.8.1
+
 --------------------------
+
 Summary
--Bug Fixes
+- Bug Fixes
+
 --------------------------
+
 Bug fixes
 
 Kos Parasite 
