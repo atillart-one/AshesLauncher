@@ -103,6 +103,8 @@ dir_path = settings_file.read()
 settings_file.close()
 moddir_file = open(r"C:/ProgramData/AshesLauncher/moddir.txt", "r")
 moddir = moddir_file.read()
+if os.path.isdir(moddir) is False:
+    moddir = ''
 moddir_file.close()
 lastmod_file = open(r"C:/ProgramData/AshesLauncher/lastmod.txt", "r")
 lastmod = lastmod_file.read()
@@ -113,6 +115,7 @@ def onObjectClick(event):
     os.system("taskkill /f /im git.exe")
     sys.exit(0)
 
+installing = 0
 
 def main():
     root = tkinter.Tk()
@@ -178,6 +181,8 @@ def main():
         def __init__(self):
             super().__init__()
             canvas.itemconfig('proglines', state='normal')
+            global installing
+            installing = 1
 
         def update(self, op_code, cur_count, max_count=None, message=''):
             x = cur_count * 864 // max_count
@@ -189,6 +194,7 @@ def main():
                 canvas.itemconfig(progress, text="Unpacking...")
 
     def install():
+        global installing
         git.Repo.clone_from("https://github.com/SirHalvard/Champions-Ashes",
                             moddir + "mods/Champion's Ashes", progress=CloneProgress(), depth=1)
         canvas.itemconfig(progress, text="")
@@ -208,12 +214,13 @@ def main():
                 config.set('files', 'modOverrideDirectory', '"/mods/_ashes"')
                 with open(dir_path + '/modengine.ini', 'w+') as file:
                     config.write(file)
-
+        installing = 0
         shutil.copy(''"lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
         shutil.copy("lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
         webbrowser.open('steam://rungameid/374320')
 
     def update():
+        global installing
         repo = git.Repo(moddir + "mods/Champion's Ashes")
         repo.remotes.origin.pull(progress=CloneProgress(), depth=1)
         canvas.itemconfig(progress, text="")
@@ -235,7 +242,7 @@ def main():
                 config.set('files', 'modOverrideDirectory', '"/mods/_ashes"')
                 with open(dir_path + '/modengine.ini', 'w+') as file:
                     config.write(file)
-
+        installing = 0
         shutil.copy(''"lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
         shutil.copy("lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
         webbrowser.open('steam://rungameid/374320')
@@ -279,6 +286,8 @@ def main():
         moddir_file = open(r"C:/ProgramData/AshesLauncher/moddir.txt", "w")
         global moddir
         moddir = filedialog.askdirectory() + '/'
+        if os.path.isfile(moddir + 'DarkSoulsIII.exe') is True:
+            moddir = moddir + 'AshesLauncher/'
         moddir_file.write(moddir)
         moddir_file.close()
         mod_path.set(moddir + 'mods')
@@ -343,6 +352,10 @@ def main():
             canvas.itemconfig('mods', state='hidden')
             canvas.itemconfig('accs', state='hidden')
             canvas_patch.place(x=50, y=250)
+            if installing = 1:
+                canvas.itemconfig('proglines', state='normal')
+                canvas.itemconfig('progress', state='normal')
+                canvas.itemconfig(progress, state='normal')
             mod_panel.place_forget()
             path_panel.place_forget()
             ashes_panel_button1.place_forget()
