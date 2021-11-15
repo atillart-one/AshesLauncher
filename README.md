@@ -19,5 +19,5 @@ Nexus Page: 	https://www.nexusmods.com/darksouls3/mods/488
 Discord: 	    https://discord.gg/xEMdvaTVc3
 
 ## Credits
-The Champion's Ashes team  (Champion's Ashes) 
+The Champion's Ashes team  (Champion's Ashes)   
 Church Guard (Lazy Loader: https://www.nexusmods.com/darksouls3/mods/677)
