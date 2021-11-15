@@ -1,5 +1,5 @@
 # AshesLauncher
-A launcher for the Dark Souls III mod Champion's Ashes.
+A launcher for the Dark Souls III mod Champion's Ashes, made by atillart#4807.  
 
 
 ## Instructions
