@@ -24,7 +24,7 @@ Church Guard (Lazy Loader: https://www.nexusmods.com/darksouls3/mods/677)
 
 Special Thanks to:
 Metal Slime Helm ro/en#0591 (testing)
-Nobody#6945 (testing)
+Nobody#6945 (testing and images)
 ultimate life form#8606 (testing and images)
 Great Mighty p0#0001 (images)
 Lunar#7499 (images)
