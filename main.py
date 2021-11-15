@@ -5,25 +5,40 @@ import os.path
 import tkinter.ttk
 from tkinter import filedialog, messagebox
 import shutil
+import random
 from pathlib import Path
 from ctypes import windll, byref, create_unicode_buffer, create_string_buffer
-import glob
+import ctypes
 import webbrowser
 import threading
+import requests
+import configparser
 import git
 
-if getattr(sys, 'frozen', False):
-        gpath = os.path.dirname(sys.executable)
-elif __file__:
-        gpath = os.path.dirname(__file__)
-git_path = gpath + r"\data\Git\bin\git.exe"
-print(git_path)
-git.refresh(path=git_path)
+kernel32 = ctypes.WinDLL('kernel32', use_last_error=True)
+process_array = (ctypes.c_uint8 * 1)()
+num_processes = kernel32.GetConsoleProcessList(process_array, 1)
+if num_processes < 3: ctypes.WinDLL('user32').ShowWindow(kernel32.GetConsoleWindow(), 0)
 
 FR_PRIVATE = 0x10
 FR_NOT_ENUM = 0x20
 
 os.system("taskkill /f /im  DarkSoulsIII.exe")
+
+"""
+Path to resources used.
+"""
+
+
+def resource_path(relative_path):
+    """ Get absolute path to resource, works for dev and for PyInstaller """
+    try:
+        # PyInstaller creates a temp folder and stores path in _MEIPASS
+        base_path = sys._MEIPASS
+    except Exception:
+        base_path = os.path.abspath(".")
+
+    return os.path.join(base_path + "/data/" + relative_path)
 
 
 def loadfont(fontpath, private=True, enumerable=False):
@@ -56,6 +71,8 @@ def loadfont(fontpath, private=True, enumerable=False):
     return bool(numFontsAdded)
 
 
+loadfont(resource_path("friz.otf"))
+
 """ 
 Removes title bar.
 """
@@ -75,28 +92,21 @@ def set_appwindow(root):
 
 
 """
-Path to resources used.
-"""
-
-
-def resource_path(relative_path):
-    """ Get absolute path to resource, works for dev and for PyInstaller """
-    try:
-        # PyInstaller creates a temp folder and stores path in _MEIPASS
-        base_path = sys._MEIPASS
-    except Exception:
-        base_path = os.path.abspath(".")
-
-    return os.path.join(base_path + "/data/" + relative_path)
-
-"""
 Creates (if it doesn't exist) and reads the location of the game folder.
 """
 Path("C:/ProgramData/AshesLauncher").mkdir(parents=True, exist_ok=True)
 Path("C:/ProgramData/AshesLauncher/settings.txt").touch(exist_ok=True)
+Path("C:/ProgramData/AshesLauncher/moddir.txt").touch(exist_ok=True)
+Path("C:/ProgramData/AshesLauncher/lastmod.txt").touch(exist_ok=True)
 settings_file = open(r"C:/ProgramData/AshesLauncher/settings.txt", "r")
 dir_path = settings_file.read()
 settings_file.close()
+moddir_file = open(r"C:/ProgramData/AshesLauncher/moddir.txt", "r")
+moddir = moddir_file.read()
+moddir_file.close()
+lastmod_file = open(r"C:/ProgramData/AshesLauncher/lastmod.txt", "r")
+lastmod = lastmod_file.read()
+lastmod_file.close()
 
 
 def onObjectClick(event):
@@ -108,15 +118,11 @@ def main():
     root = tkinter.Tk()
     title_icon = tkinter.PhotoImage(file=resource_path('icon.png'))
     root.wm_title("Champion's Ashes")
-    root.geometry('1280x720+320+180')
+    root.geometry('1280x720')
+    root.attributes('-topmost', True)
+    root.update()
+    root.attributes('-topmost', False)
     root.iconphoto(True, title_icon)
-
-    def disabled_folder():
-        if os.path.isdir(dir_path + "/disabled") is True:
-            files = glob.iglob(os.path.join(dir_path + "/disabled"))
-            for file in files:
-                if os.path.isfile(file):
-                    shutil.copy(file, dir_path)
 
     def play_vanilla(event):
         if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
@@ -129,34 +135,122 @@ def main():
         if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
             messagebox.showinfo("AshesLauncher", "Please select Game folder.")
             browse()
-        else:
+        elif mod_name.get() == "Champion's Ashes":
+            Path(moddir + "mods/Champion's Ashes").mkdir(parents=True, exist_ok=True)
             ashes()
+        else:
+            Path(moddir + "mods/Champion's Ashes").mkdir(parents=True, exist_ok=True)
+            play_mod()
+
+    def play_mod():
+        if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
+            messagebox.showerror("AshesLauncher", "Please select Game folder.")
+            browse()
+        else:
+            if os.path.islink(dir_path + '/mods') is True:
+                os.unlink(dir_path + '/mods')
+            elif os.path.isdir(dir_path + '/mods') is True:
+                os.rmdir(dir_path + '/mods')
+            os.symlink(os.path.abspath(moddir + "mods/Champion's Ashes"), dir_path + r'/mods',
+                       target_is_directory=True)
+
+            for modfiles in os.listdir(moddir + 'mods/' + mod_name.get()):
+                if modfiles.endswith('.txt') is True:
+                    shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
+                if modfiles.endswith('.ini') is True:
+                    shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
+                if os.path.isdir(moddir + 'mods/' + mod_name.get() + '/' + modfiles) is True:
+                    config = configparser.ConfigParser()
+                    config.read(moddir + 'mods/' + mod_name.get() + '/modengine.ini')
+                    config.set('files', 'modOverrideDirectory', '"/mods/' + modfiles + '"')
+                    with open(dir_path + '/modengine.ini', 'w+') as file:
+                        config.write(file)
+
+            shutil.copy(''"lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
+            shutil.copy("lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
+            webbrowser.open('steam://rungameid/374320')
 
     def vanilla():
         delete()
-        disabled_folder()
         webbrowser.open('steam://rungameid/374320')
 
     class CloneProgress(git.RemoteProgress):
-        def update(self, op_code, cur_count, max_count=None, message=''):
+        def __init__(self):
+            super().__init__()
             canvas.itemconfig('proglines', state='normal')
+
+        def update(self, op_code, cur_count, max_count=None, message=''):
             x = cur_count * 864 // max_count
-            canvas.coords('progress', 150, 605, 150 + x, 620)
-            print(self._cur_line)
+            canvas.coords('progress', canvas.coords('progress')[0], canvas.coords('progress')[1],
+                          canvas.coords('progress')[0] + x,
+                          canvas.coords('progress')[3])
+            canvas.itemconfig(progress, text=self._cur_line)
+            if "done" in self._cur_line:
+                canvas.itemconfig(progress, text="Unpacking...")
 
     def install():
         git.Repo.clone_from("https://github.com/SirHalvard/Champions-Ashes",
-                            dir_path + "/AshesLauncher/Ashes", depth=1, progress=CloneProgress())
+                            moddir + "mods/Champion's Ashes", progress=CloneProgress(), depth=1)
+        canvas.itemconfig(progress, text="")
+        if os.path.islink(dir_path + '/mods') is True:
+            os.unlink(dir_path + '/mods')
+        elif os.path.isdir(dir_path + '/mods') is True:
+            os.rmdir(dir_path + '/mods')
+        os.symlink(os.path.abspath(moddir + "mods/Champion's Ashes"), dir_path + r'/mods', target_is_directory=True)
+        for modfiles in os.listdir(moddir + 'mods/' + mod_name.get()):
+            if modfiles.endswith('.txt') is True:
+                shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
+            if modfiles.endswith('.ini') is True:
+                shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
+            if os.path.isdir(moddir + 'mods/' + mod_name.get() + '/' + modfiles) is True:
+                config = configparser.ConfigParser()
+                config.read(moddir + 'mods/' + mod_name.get() + '/modengine.ini')
+                config.set('files', 'modOverrideDirectory', '"/mods/_ashes"')
+                with open(dir_path + '/modengine.ini', 'w+') as file:
+                    config.write(file)
+
+        shutil.copy(''"lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
+        shutil.copy("lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
         webbrowser.open('steam://rungameid/374320')
 
     def update():
-        repo = git.Repo(dir_path + "/AshesLauncher/Ashes")
-        repo.remotes.origin.pull(progress=CloneProgress())
+        repo = git.Repo(moddir + "mods/Champion's Ashes")
+        repo.remotes.origin.pull(progress=CloneProgress(), depth=1)
+        canvas.itemconfig(progress, text="")
+        if os.path.islink(dir_path + '/mods') is True:
+            os.unlink(dir_path + '/mods')
+        elif os.path.isdir(dir_path + '/mods') is True:
+            os.rmdir(dir_path + '/mods')
+
+        os.symlink(os.path.abspath(moddir + "mods/Champion's Ashes"), dir_path + r'/mods',
+                   target_is_directory=True)
+        for modfiles in os.listdir(moddir + 'mods/' + mod_name.get()):
+            if modfiles.endswith('.txt') is True:
+                shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
+            if modfiles.endswith('.ini') is True:
+                shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
+            if os.path.isdir(moddir + 'mods/' + mod_name.get() + '/' + modfiles) is True:
+                config = configparser.ConfigParser()
+                config.read(moddir + 'mods/' + mod_name.get() + '/modengine.ini')
+                config.set('files', 'modOverrideDirectory', '"/mods/_ashes"')
+                with open(dir_path + '/modengine.ini', 'w+') as file:
+                    config.write(file)
+
+        shutil.copy(''"lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
+        shutil.copy("lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
         webbrowser.open('steam://rungameid/374320')
 
+    def reset():
+        repo = git.Repo(moddir + "mods/Champion's Ashes")
+        repo.git.reset('--hard', 'origin/master')
+
+    def clean():
+        repo = git.Repo(moddir + "mods/Champion's Ashes")
+        repo.git.clean('-xdf')
+
     def ashes():
-        if os.path.isdir(dir_path + "/AshesLauncher/Ashes/.git") is False:
-            Path(dir_path + "/AshesLauncher/Ashes").mkdir(parents=True, exist_ok=True)
+        if os.path.isdir(moddir + "mods/Champion's Ashes/.git") is False:
+            Path(moddir + "mods/Champion's Ashes").mkdir(parents=True, exist_ok=True)
             s = threading.Thread(target=install)
             s.setDaemon(True)
             s.start()
@@ -170,6 +264,8 @@ def main():
             os.remove(dir_path + "/dinput8.dll")
         if os.path.isfile(dir_path + "/modengine.ini"):
             os.remove(dir_path + "/modengine.ini")
+        if os.path.isfile(dir_path + "/lazyLoad.ini"):
+            os.remove(dir_path + "/lazyLoad.ini")
 
     def browse():
         settings_file = open(r"C:/ProgramData/AshesLauncher/settings.txt", "w")
@@ -177,6 +273,15 @@ def main():
         dir_path = filedialog.askdirectory()
         settings_file.write(dir_path)
         settings_file.close()
+        game_path.set(dir_path)
+
+    def browse_mod():
+        moddir_file = open(r"C:/ProgramData/AshesLauncher/moddir.txt", "w")
+        global moddir
+        moddir = filedialog.askdirectory() + '/'
+        moddir_file.write(moddir)
+        moddir_file.close()
+        mod_path.set(moddir + 'mods')
 
     """Lets user drag the window to reposition."""
 
@@ -211,13 +316,74 @@ def main():
         canvas.tag_bind(mod_button, "<Leave>", lambda event: canvas.itemconfig(mod_button, image=enabled))
         canvas.tag_bind(play_button, "<ButtonPress-1>", play_ashes)
 
+    def preset_vanilla(event):
+        if os.path.isfile(moddir + "mods/Champion's Ashes/GraphicPresets/Enable VANILLA.cmd") is False:
+            messagebox.showerror("AshesLauncher", "Please install the mod first.")
+        else:
+            os.startfile(moddir + "mods/Champion's Ashes/GraphicPresets/Enable VANILLA.cmd")
+
+    def preset_default(event):
+        if os.path.isfile(moddir + "mods/Champion's Ashes/GraphicPresets/Enable PERFORMANCE.cmd") is False:
+            messagebox.showerror("AshesLauncher", "Please install the mod first.")
+        else:
+            os.startfile(moddir + "mods/Champion's Ashes/GraphicPresets/Enable PERFORMANCE.cmd")
+
+    def preset_fidelity(event):
+        if os.path.isfile(moddir + "mods/Champion's Ashes/GraphicPresets/Enable PERFORMANCE.cmd") is False:
+            messagebox.showerror("AshesLauncher", "Please install the mod first.")
+        else:
+            os.startfile(moddir + "mods/Champion's Ashes/GraphicPresets/Enable FIDELITY.cmd")
+
+    """ Swap Tabs"""
+
+    def tab_select(i, event):
+        if i == 'home':
+            canvas.itemconfig('home', state='normal')
+            canvas.itemconfig('graphics', state='hidden')
+            canvas.itemconfig('mods', state='hidden')
+            canvas.itemconfig('accs', state='hidden')
+            canvas_patch.place(x=50, y=250)
+            mod_panel.place_forget()
+            path_panel.place_forget()
+            ashes_panel_button1.place_forget()
+            ashes_panel_button2.place_forget()
+        if i == 'graphics':
+            canvas.itemconfig('home', state='hidden')
+            canvas.itemconfig('graphics', state='normal')
+            canvas.itemconfig('mods', state='hidden')
+            canvas.itemconfig('accs', state='hidden')
+            canvas_patch.place_forget()
+            mod_panel.place_forget()
+            path_panel.place_forget()
+            ashes_panel_button1.place_forget()
+            ashes_panel_button2.place_forget()
+        if i == 'mods':
+            canvas.itemconfig('home', state='hidden')
+            canvas.itemconfig('graphics', state='hidden')
+            canvas.itemconfig('mods', state='normal')
+            canvas.itemconfig('accs', state='hidden')
+            canvas_patch.place_forget()
+            mod_panel.place(x=50, y=150)
+            path_panel.place(x=540, y=150)
+            ashes_panel_button1.place(x=540, y=520)
+            ashes_panel_button2.place(x=540, y=580)
+        if i == 'accs':
+            canvas.itemconfig('home', state='hidden')
+            canvas.itemconfig('graphics', state='hidden')
+            canvas.itemconfig('mods', state='hidden')
+            canvas.itemconfig('accs', state='normal')
+            canvas_patch.place_forget()
+            mod_panel.place_forget()
+            path_panel.place_forget()
+            ashes_panel_button1.place_forget()
+            ashes_panel_button2.place_forget()
+
     canvas = tkinter.Canvas(width=1280, height=720, bg='black', highlightthickness=0)
     canvas.pack(expand=tkinter.YES, fill=tkinter.BOTH)
 
     """IMAGE PATHS"""
     cross_pic = tkinter.PhotoImage(file=resource_path('cross.png'))
     hold_pic = tkinter.PhotoImage(file=resource_path('hold.png'))
-    bg = tkinter.PhotoImage(file=resource_path('bg.png'))
     panel = tkinter.PhotoImage(file=resource_path('panel.png'))
     play = tkinter.PhotoImage(file=resource_path('play.png'))
     play_select = tkinter.PhotoImage(file=resource_path('play_select.png'))
@@ -225,20 +391,205 @@ def main():
     enabled_select = tkinter.PhotoImage(file=resource_path('enabled_select.png'))
     disabled = tkinter.PhotoImage(file=resource_path('disabled.png'))
     disabled_select = tkinter.PhotoImage(file=resource_path('disabled_select.png'))
-    logo = tkinter.PhotoImage(file=resource_path('logo.png'))
+    patch = tkinter.PhotoImage(file=resource_path('patch.png'))
+    up = tkinter.PhotoImage(file=resource_path('up.png'))
+    down = tkinter.PhotoImage(file=resource_path('down.png'))
+    graph = tkinter.PhotoImage(file=resource_path('graphics_panel.png'))
+    vanilla_text = tkinter.PhotoImage(file=resource_path('vanilla.png'))
+    default_text = tkinter.PhotoImage(file=resource_path('default.png'))
+    fidelity_text = tkinter.PhotoImage(file=resource_path('fidelity.png'))
+    graph_select = tkinter.PhotoImage(file=resource_path('graphics_panel_select.png'))
+    discord = tkinter.PhotoImage(file=resource_path('discord.png'))
+    changelog = tkinter.PhotoImage(file=resource_path('changelog.png'))
+    wiki = tkinter.PhotoImage(file=resource_path('wiki.png'))
+    home = tkinter.PhotoImage(file=resource_path('home.png'))
+    home_select = tkinter.PhotoImage(file=resource_path('home_select.png'))
+    mods_img = tkinter.PhotoImage(file=resource_path('mods.png'))
+    paths_img = tkinter.PhotoImage(file=resource_path('paths.png'))
+    ashes_img = tkinter.PhotoImage(file=resource_path('ashes.png'))
 
-    """IMAGES"""
+    """BACKGROUND"""
+    try:
+        count = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher"
+                             "/main/images/image_count.txt").text
+
+        weight = []
+        for i in range(1, int(count) + 1):
+            if i == 1:
+                weight.append(1)
+            elif i == 2:
+                weight.append(1)
+            else:
+                weight.append(round(998 / ((int(count) - 2))))
+        num_img = random.choices(range(1, int(count) + 1), weights=weight)
+        response = requests.get(
+            "https://raw.githubusercontent.com/Atillart-One/AshesLauncher/main/images/"
+            + str(num_img).replace('[', '').replace(']', '') + ".png")
+        file = open("bg.png", "wb")
+        file.write(response.content)
+        file.close()
+        bg = tkinter.PhotoImage(file="bg.png")
+        os.remove("bg.png")
+
+    except (requests.ConnectionError, requests.Timeout, tkinter.TclError):
+        bg = tkinter.PhotoImage(file=resource_path('bg.png'))
+    """Main Canvas"""
     canvas.create_image(0, 0, image=bg, anchor=tkinter.NW)
     canvas.create_image(0, 0, image=panel, anchor=tkinter.NW)
-    canvas.create_image(0, -50, image=logo, anchor=tkinter.NW)
     hold = canvas.create_image(0, 0, image=hold_pic, anchor=tkinter.NW)
+    home_button = canvas.create_text(60, 20, text='HOME', font=("Friz Quadrata Std", 16), fill='#ecd9ad',
+                                     activefill="#e4dfd4", anchor=tkinter.NW)
+    graphics_button = canvas.create_text(210, 20, text='GRAPHICS', font=("Friz Quadrata Std", 16), fill='#ecd9ad',
+                                         activefill="#e4dfd4", anchor=tkinter.NW)
+    mods_button = canvas.create_text(390, 20, text='MODS', font=("Friz Quadrata Std", 16), fill='#ecd9ad',
+                                     activefill="#e4dfd4", anchor=tkinter.NW, state='normal')
+    accounts_button = canvas.create_text(530, 20, text='ACCOUNTS', font=("Friz Quadrata Std", 16), fill='#ecd9ad',
+                                         activefill="#e4dfd4", anchor=tkinter.NW, state='hidden')
     cross = canvas.create_image(1220, 15, image=cross_pic, anchor=tkinter.NW)
-    canvas.create_rectangle(150, 603, 1014, 605, fill='#bc9a4c', width=0, tags='proglines', state='hidden')
-    canvas.create_rectangle(150, 620, 1014, 622, fill='#bc9a4c', width=0, tags='proglines', state='hidden')
-    canvas.create_rectangle(0, 0, 0, 0, fill='#ebd7aa', width=0, state='hidden', tags=['progress', 'proglines'])
-    play_button = canvas.create_image(1280, 570, image=play, anchor=tkinter.NE)
-    mod_button = canvas.create_image(1280, 573, image=disabled, anchor=tkinter.SE)
-    canvas.create_rectangle(0, 55, 1280, 58, fill='#ddcc9d', width=0)
+
+    """HOME"""
+    progline1 = canvas.create_rectangle(150, 613, 1014, 615, fill='#bc9a4c', width=0, tags=['proglines', 'home'],
+                                        state='hidden')
+    progline2 = canvas.create_rectangle(150, 630, 1014, 632, fill='#bc9a4c', width=0, tags=['proglines', 'home'],
+                                        state='hidden')
+    canvas.create_rectangle(150, 615, 150, 630, fill='#ebd7aa', width=0, state='hidden',
+                            tags=['progress', 'proglines', 'home'])
+    progress = canvas.create_text(582, 595, text='', fill='#e4dfd4', font=('Friz Quadrata Std', 16), tags='home')
+    play_button = canvas.create_image(1280, 580, image=play, anchor=tkinter.NE, tags='home')
+    mod_button = canvas.create_image(1280, 583, image=disabled, anchor=tkinter.SE, tags='home')
+    canvas.create_rectangle(0, 56, 1280, 58, fill='#ba9749', width=0)
+
+    canvas.create_image(650, 135, image=discord, tags=('discord', 'home'), anchor=tkinter.NW)
+    canvas.create_image(650, 210, image=wiki, tags=('wiki', 'home'), anchor=tkinter.NW)
+    canvas.create_image(650, 285, image=changelog, tags=('changelog', 'home'), anchor=tkinter.NW)
+
+    discord_panel = canvas.create_image(650, 135, image=discord, tags='home', anchor=tkinter.NW)
+    wiki_panel = canvas.create_image(650, 210, image=wiki, tags='home', anchor=tkinter.NW)
+    changelog_panel = canvas.create_image(650, 285, image=changelog, tags='home', anchor=tkinter.NW)
+
+    """Display Patch Notes"""
+    canvas.create_image(-3, 135, image=patch, anchor=tkinter.NW, tags='home')
+    canvas_patch = tkinter.Canvas(width=580, height=270, highlightthickness=0)
+    canvas_patch.place(x=50, y=250)
+    canvas_patch.create_image(-50, -250, image=bg, anchor=tkinter.NW)
+    canvas_patch.create_image(-50, -250, image=hold_pic, anchor=tkinter.NW)
+    canvas_patch.create_image(-53, -115, image=patch, anchor=tkinter.NW)
+
+    try:
+        patchnotes = requests.get(
+            "https://raw.githubusercontent.com/Atillart-One/AshesLauncher/main/patchnotes.txt").text
+        patchnotes_text = canvas_patch.create_text(0, 10, text=patchnotes.replace('\r', ''), fill='#e4dfd4', width=525,
+                                                   font=("Friz Quadrata Std", 12), anchor=tkinter.NW)
+    except (requests.ConnectionError, requests.Timeout):
+        patchnotes_text = canvas_patch.create_text(0, 10, text='', fill='#e4dfd4', width=525,
+                                                   font=("Friz Quadrata Std", 12), anchor=tkinter.NW)
+
+    canvas_patch.create_image(573, 265, image=down, anchor=tkinter.SE, tags='down')
+    canvas_patch.create_image(573, 228, image=up, anchor=tkinter.SE, tags='up')
+
+    def patch_up(event):
+        if canvas_patch.coords(patchnotes_text)[1] + 50 < 10:
+            canvas_patch.move(patchnotes_text, 0, 50)
+        else:
+            canvas_patch.move(patchnotes_text, 0, 10 - canvas_patch.bbox(patchnotes_text)[1])
+
+    def patch_down(event):
+        if canvas_patch.bbox(patchnotes_text)[3] - 50 > 280:
+            canvas_patch.move(patchnotes_text, 0, -50)
+        else:
+            canvas_patch.move(patchnotes_text, 0, 280 - canvas_patch.bbox(patchnotes_text)[3])
+
+    canvas_patch.tag_bind('up', "<ButtonPress-1>", patch_up)
+    canvas_patch.tag_bind('down', "<ButtonPress-1>", patch_down)
+
+    """GRAPHICS"""
+
+    canvas.create_image(270, 365, image=graph, tags=('graphics', 'vanilla'), state='hidden')
+    canvas.create_image(640, 365, image=graph, tags=('graphics', 'default'), state='hidden')
+    canvas.create_image(1010, 365, image=graph, tags=('graphics', 'fidelity'), state='hidden')
+
+    canvas.create_image(270, 175, image=vanilla_text, tags='graphics', state='hidden')
+    canvas.create_image(640, 175, image=default_text, tags='graphics',
+                        state='hidden')
+    canvas.create_image(1010, 175, image=fidelity_text, tags='graphics',
+                        state='hidden')
+
+    canvas.create_text(150, 280,
+                       text='The preset closest to the vanilla game. The least graphically demanding preset.\n\n'
+                            'For those who prefer lighting closer to vanilla or have issues running the '
+                            'other presets.',
+                       fill='#e4dfd4', width=250,
+                       font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
+    canvas.create_text(520, 280,
+                       text="The default preset for Champion's Ashes. Similar to fidelity with an emphasis on "
+                            "performance.\n\n "
+                            "For those who prefer the new graphical changes but have issues running fidelity.",
+                       fill='#e4dfd4', width=250,
+                       font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
+    canvas.create_text(890, 280,
+                       text="The intended preset for Champion's Ashes. The most graphically demanding preset.\n\n"
+                            'For those who want to experience the new graphical changes at their finest.',
+                       fill='#e4dfd4', width=250,
+                       font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
+
+    vanilla_panel = canvas.create_rectangle(115, 115, 425, 615, fill='', width=0, state='hidden', tags='graphics')
+    default_panel = canvas.create_rectangle(485, 115, 795, 615, fill='', width=0, state='hidden', tags='graphics')
+    fidelity_panel = canvas.create_rectangle(855, 115, 1165, 615, fill='', width=0, state='hidden', tags='graphics')
+
+    '''MODS'''
+    if lastmod == '':
+        mod_name = tkinter.StringVar(root, value="Champion's Ashes")
+    else:
+        mod_name = tkinter.StringVar(root, value=lastmod)
+    mod_panel = tkinter.LabelFrame(root, bg='#0a0a0a', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
+                                   font=('Friz Quadrata Std', 24))
+    canvas.create_image(50, 100, image=mods_img, anchor=tkinter.NW, state='hidden', tags='mods')
+
+    def modchosen():
+        lastmod_file = open(r"C:/ProgramData/AshesLauncher/lastmod.txt", "w")
+        lastmod_file.write(mod_name.get())
+        lastmod_file.close()
+
+    for mod in os.listdir("mods"):
+        radio = tkinter.Radiobutton(mod_panel, indicatoron=0, text=mod, variable=mod_name, value=mod, width=40,
+                                    bg='#0a0a0a', fg='#e4dfd4', selectcolor='#273355', borderwidth=1,
+                                    activeforeground='#0f0f0f', activebackground='#e4dfd4', command=modchosen,
+                                    font=('Friz Quadrata Std', 14), relief=tkinter.SOLID)
+
+        radio.grid()
+    game_path = tkinter.StringVar(root, dir_path)
+    if moddir == '':
+        mod_path = tkinter.StringVar(root, os.path.abspath('.') + '/mods')
+    else:
+        mod_path = tkinter.StringVar(root, moddir + 'mods')
+    canvas.create_image(540, 100, image=paths_img, anchor=tkinter.NW, state='hidden', tags='mods')
+    path_panel = tkinter.LabelFrame(root, bg='#0a0a0a', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
+                                    font=('Friz Quadrata Std', 24))
+    tkinter.Label(path_panel, wraplength=520, text='Game Path: ', font=('Friz Quadrata Std', 18), bg='#0a0a0a',
+                  fg='#f0deb4').grid(column=0, row=0, padx=10)
+    tkinter.Label(path_panel, wraplength=520, textvariable=game_path, font=('Friz Quadrata Std', 14), bg='#0a0a0a',
+                  fg='#e4dfd4').grid(column=1, row=0, padx=10)
+    tkinter.Button(path_panel, text='Browse', bd=1, font=('Friz Quadrata Std', 12), bg='#0a0a0a',
+                   fg='#f0deb4', command=browse, relief=tkinter.GROOVE, activeforeground='#0f0f0f',
+                   activebackground='#e4dfd4').grid(column=1, padx=10, pady=10)
+
+    tkinter.Label(path_panel, wraplength=520, text='Mods Path: ', font=('Friz Quadrata Std', 18), bg='#0a0a0a',
+                  fg='#f0deb4').grid(column=0, row=3, padx=10)
+    tkinter.Label(path_panel, wraplength=520, textvariable=mod_path, font=('Friz Quadrata Std', 14), bg='#0a0a0a',
+                  fg='#e4dfd4').grid(column=1, row=3, padx=10)
+    tkinter.Button(path_panel, text='Browse', bd=1, font=('Friz Quadrata Std', 12), bg='#0a0a0a',
+                   fg='#f0deb4', command=browse_mod, relief=tkinter.GROOVE, activeforeground='#0f0f0f',
+                   activebackground='#e4dfd4').grid(column=1, row=4, padx=20, pady=10)
+
+    canvas.create_image(540, 450, image=ashes_img, anchor=tkinter.NW, state='hidden', tags='mods')
+    ashes_panel_button1 = tkinter.Button(root, text='Restore All Files', bd=1, font=('Friz Quadrata Std', 18),
+                                         bg='#0a0a0a', fg='#e4dfd4', command=reset, relief=tkinter.GROOVE,
+                                         activeforeground='#0f0f0f',
+                                         activebackground='#e4dfd4', width=50)
+    ashes_panel_button2 = tkinter.Button(root, text='Remove Extra Files', bd=1, font=('Friz Quadrata Std', 18),
+                                         bg='#0a0a0a',
+                                         fg='#e4dfd4', command=clean, relief=tkinter.GROOVE, activeforeground='#0f0f0f',
+                                         activebackground='#e4dfd4', width=50)
 
     """BINDS"""
     canvas.tag_bind(cross, '<ButtonPress-1>', onObjectClick)
@@ -251,6 +602,30 @@ def main():
     canvas.tag_bind(mod_button, "<ButtonPress-1>", mod_enabled)
     canvas.tag_bind(mod_button, "<Enter>", lambda event: canvas.itemconfig(mod_button, image=disabled_select))
     canvas.tag_bind(mod_button, "<Leave>", lambda event: canvas.itemconfig(mod_button, image=disabled))
+    canvas.tag_bind(home_button, '<ButtonPress-1>', lambda event: tab_select('home', event))
+    canvas.tag_bind(graphics_button, '<ButtonPress-1>', lambda event: tab_select('graphics', event))
+    canvas.tag_bind(accounts_button, '<ButtonPress-1>', lambda event: tab_select('accs', event))
+    canvas.tag_bind(mods_button, '<ButtonPress-1>', lambda event: tab_select('mods', event))
+    canvas.tag_bind(vanilla_panel, "<Enter>", lambda event: canvas.itemconfig('vanilla', image=graph_select))
+    canvas.tag_bind(vanilla_panel, "<Leave>", lambda event: canvas.itemconfig('vanilla', image=graph))
+    canvas.tag_bind(default_panel, "<Enter>", lambda event: canvas.itemconfig('default', image=graph_select))
+    canvas.tag_bind(default_panel, "<Leave>", lambda event: canvas.itemconfig('default', image=graph))
+    canvas.tag_bind(fidelity_panel, "<Enter>", lambda event: canvas.itemconfig('fidelity', image=graph_select))
+    canvas.tag_bind(fidelity_panel, "<Leave>", lambda event: canvas.itemconfig('fidelity', image=graph))
+    canvas.tag_bind(vanilla_panel, "<ButtonPress-1>", preset_vanilla)
+    canvas.tag_bind(default_panel, "<ButtonPress-1>", preset_default)
+    canvas.tag_bind(fidelity_panel, "<ButtonPress-1>", preset_fidelity)
+    canvas.tag_bind(discord_panel, "<Enter>", lambda event: canvas.itemconfig(discord_panel, image=home_select))
+    canvas.tag_bind(discord_panel, "<Leave>", lambda event: canvas.itemconfig(discord_panel, image=home))
+    canvas.tag_bind(changelog_panel, "<Enter>", lambda event: canvas.itemconfig(changelog_panel, image=home_select))
+    canvas.tag_bind(changelog_panel, "<Leave>", lambda event: canvas.itemconfig(changelog_panel, image=home))
+    canvas.tag_bind(wiki_panel, "<Enter>", lambda event: canvas.itemconfig(wiki_panel, image=home_select))
+    canvas.tag_bind(wiki_panel, "<Leave>", lambda event: canvas.itemconfig(wiki_panel, image=home))
+    canvas.tag_bind(discord_panel, "<ButtonPress-1>",
+                    lambda event: webbrowser.open('https://discord.com/invite/Kqtwa5w'))
+    canvas.tag_bind(changelog_panel, "<ButtonPress-1>", lambda event: webbrowser.open(
+        'https://docs.google.com/document/d/1j4UVY_1E6jqCX-sthQ467BGq67YmGrjx1I5huEmtciA/edit?usp=sharing'))
+    canvas.tag_bind(wiki_panel, "<ButtonPress-1>", lambda event: webbrowser.open('http://championsashes.wikidot.com/'))
 
     root.resizable(False, False)
     root.overrideredirect(True)
