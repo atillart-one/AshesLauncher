@@ -356,6 +356,10 @@ def main():
                 canvas.itemconfig('proglines', state='normal')
                 canvas.itemconfig('progress', state='normal')
                 canvas.itemconfig(progress, state='normal')
+            else:
+                canvas.itemconfig('proglines', state='hidden')
+                canvas.itemconfig('progress', state='hidden')
+                canvas.itemconfig(progress, state='hidden')
             mod_panel.place_forget()
             path_panel.place_forget()
             ashes_panel_button1.place_forget()
