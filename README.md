@@ -4,11 +4,9 @@ A launcher for the Dark Souls III mod Champion's Ashes.
 
 ## Instructions
 Make sure to delete any manual installations of the mod before using this launcher.  
-To use, simply extract the AshesLauncher4.exe and data folder together and run the exe.
+To use, simply extract into a folder and run AshesLauncher4.exe.
 
-To utilize other mods when not playing Champion's Ashes, simply create a folder called 'disabled' in your Game folder and put any dll and ini files there. 
-Other files should be placed as per the mod's instructions.
-
+To utilize other mods when not playing Champion's Ashes, simply put the mod in the folder called mods. The folder should contain the dll, ini, txt etc and folders needed.
 
 ## IMPORTANT NOTE
 This mod WILL ban you if you have it enabled and launch the game.   
@@ -20,4 +18,5 @@ Nexus Page: 	https://www.nexusmods.com/darksouls3/mods/488
 Discord: 	    https://discord.gg/xEMdvaTVc3
 
 ## Credits
-The Champion's Ashes team  
+The Champion's Ashes team  (Champion's Ashes)
+Church Guard (Lazy Loader: https://www.nexusmods.com/darksouls3/mods/677)
