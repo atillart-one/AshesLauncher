@@ -115,7 +115,9 @@ def onObjectClick(event):
     os.system("taskkill /f /im git.exe")
     sys.exit(0)
 
+
 installing = 0
+
 
 def main():
     root = tkinter.Tk()
@@ -352,7 +354,7 @@ def main():
             canvas.itemconfig('mods', state='hidden')
             canvas.itemconfig('accs', state='hidden')
             canvas_patch.place(x=50, y=250)
-            if installing = 1:
+            if installing == 1:
                 canvas.itemconfig('proglines', state='normal')
                 canvas.itemconfig('progress', state='normal')
                 canvas.itemconfig(progress, state='normal')
@@ -361,7 +363,10 @@ def main():
                 canvas.itemconfig('progress', state='hidden')
                 canvas.itemconfig(progress, state='hidden')
             mod_panel.place_forget()
-            path_panel.place_forget()
+            path_panel1.place_forget()
+            path_panel2.place_forget()
+            browse_button.place_forget()
+            browsemod_button.place_forget()
             ashes_panel_button1.place_forget()
             ashes_panel_button2.place_forget()
         if i == 'graphics':
@@ -371,7 +376,10 @@ def main():
             canvas.itemconfig('accs', state='hidden')
             canvas_patch.place_forget()
             mod_panel.place_forget()
-            path_panel.place_forget()
+            path_panel1.place_forget()
+            path_panel2.place_forget()
+            browse_button.place_forget()
+            browsemod_button.place_forget()
             ashes_panel_button1.place_forget()
             ashes_panel_button2.place_forget()
         if i == 'mods':
@@ -381,9 +389,12 @@ def main():
             canvas.itemconfig('accs', state='hidden')
             canvas_patch.place_forget()
             mod_panel.place(x=50, y=150)
-            path_panel.place(x=540, y=150)
-            ashes_panel_button1.place(x=540, y=520)
-            ashes_panel_button2.place(x=540, y=580)
+            path_panel1.place(x=540, y=150)
+            path_panel2.place(x=540, y=280)
+            browse_button.place(x=850, y=220)
+            browsemod_button.place(x=850, y=350)
+            ashes_panel_button1.place(x=540, y=550)
+            ashes_panel_button2.place(x=540, y=610)
         if i == 'accs':
             canvas.itemconfig('home', state='hidden')
             canvas.itemconfig('graphics', state='hidden')
@@ -391,7 +402,10 @@ def main():
             canvas.itemconfig('accs', state='normal')
             canvas_patch.place_forget()
             mod_panel.place_forget()
-            path_panel.place_forget()
+            path_panel1.place_forget()
+            path_panel2.place_forget()
+            browse_button.place_forget()
+            browsemod_button.place_forget()
             ashes_panel_button1.place_forget()
             ashes_panel_button2.place_forget()
 
@@ -465,24 +479,24 @@ def main():
     cross = canvas.create_image(1220, 15, image=cross_pic, anchor=tkinter.NW)
 
     """HOME"""
-    progline1 = canvas.create_rectangle(150, 613, 1014, 615, fill='#bc9a4c', width=0, tags=['proglines', 'home'],
+    progline1 = canvas.create_rectangle(180, 630, 1045, 632, fill='#bc9a4c', width=0, tags=['proglines', 'home'],
                                         state='hidden')
-    progline2 = canvas.create_rectangle(150, 630, 1014, 632, fill='#bc9a4c', width=0, tags=['proglines', 'home'],
+    progline2 = canvas.create_rectangle(180, 648, 1045, 650, fill='#bc9a4c', width=0, tags=['proglines', 'home'],
                                         state='hidden')
-    canvas.create_rectangle(150, 615, 150, 630, fill='#ebd7aa', width=0, state='hidden',
+    canvas.create_rectangle(180, 632, 180, 648, fill='#ebd7aa', width=0, state='hidden',
                             tags=['progress', 'proglines', 'home'])
-    progress = canvas.create_text(582, 595, text='', fill='#e4dfd4', font=('Friz Quadrata Std', 16), tags='home')
-    play_button = canvas.create_image(1280, 580, image=play, anchor=tkinter.NE, tags='home')
-    mod_button = canvas.create_image(1280, 583, image=disabled, anchor=tkinter.SE, tags='home')
+    progress = canvas.create_text(612, 610, text='', fill='#e4dfd4', font=('Friz Quadrata Std', 16), tags='home')
+    play_button = canvas.create_image(1282, 600, image=play, anchor=tkinter.NE, tags='home')
+    mod_button = canvas.create_image(1282, 600, image=disabled, anchor=tkinter.SE, tags='home')
     canvas.create_rectangle(0, 56, 1280, 58, fill='#ba9749', width=0)
 
     canvas.create_image(650, 135, image=discord, tags=('discord', 'home'), anchor=tkinter.NW)
-    canvas.create_image(650, 210, image=wiki, tags=('wiki', 'home'), anchor=tkinter.NW)
-    canvas.create_image(650, 285, image=changelog, tags=('changelog', 'home'), anchor=tkinter.NW)
+    canvas.create_image(650, 205, image=wiki, tags=('wiki', 'home'), anchor=tkinter.NW)
+    canvas.create_image(650, 275, image=changelog, tags=('changelog', 'home'), anchor=tkinter.NW)
 
     discord_panel = canvas.create_image(650, 135, image=discord, tags='home', anchor=tkinter.NW)
-    wiki_panel = canvas.create_image(650, 210, image=wiki, tags='home', anchor=tkinter.NW)
-    changelog_panel = canvas.create_image(650, 285, image=changelog, tags='home', anchor=tkinter.NW)
+    wiki_panel = canvas.create_image(650, 205, image=wiki, tags='home', anchor=tkinter.NW)
+    changelog_panel = canvas.create_image(650, 275, image=changelog, tags='home', anchor=tkinter.NW)
 
     """Display Patch Notes"""
     canvas.create_image(-3, 135, image=patch, anchor=tkinter.NW, tags='home')
@@ -580,25 +594,27 @@ def main():
     else:
         mod_path = tkinter.StringVar(root, moddir + 'mods')
     canvas.create_image(540, 100, image=paths_img, anchor=tkinter.NW, state='hidden', tags='mods')
-    path_panel = tkinter.LabelFrame(root, bg='#0a0a0a', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
-                                    font=('Friz Quadrata Std', 24))
-    tkinter.Label(path_panel, wraplength=520, text='Game Path: ', font=('Friz Quadrata Std', 18), bg='#0a0a0a',
+    path_panel1 = tkinter.LabelFrame(root, bg='#0a0a0a', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
+                                     font=('Friz Quadrata Std', 24))
+    path_panel2 = tkinter.LabelFrame(root, bg='#0a0a0a', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
+                                     font=('Friz Quadrata Std', 24))
+    tkinter.Label(path_panel1, wraplength=520, text='Game Path: ', font=('Friz Quadrata Std', 18), bg='#0a0a0a',
                   fg='#f0deb4').grid(column=0, row=0, padx=10)
-    tkinter.Label(path_panel, wraplength=520, textvariable=game_path, font=('Friz Quadrata Std', 14), bg='#0a0a0a',
+    tkinter.Label(path_panel1, wraplength=520, textvariable=game_path, font=('Friz Quadrata Std', 14), bg='#0a0a0a',
                   fg='#e4dfd4').grid(column=1, row=0, padx=10)
-    tkinter.Button(path_panel, text='Browse', bd=1, font=('Friz Quadrata Std', 12), bg='#0a0a0a',
-                   fg='#f0deb4', command=browse, relief=tkinter.GROOVE, activeforeground='#0f0f0f',
-                   activebackground='#e4dfd4').grid(column=1, padx=10, pady=10)
-
-    tkinter.Label(path_panel, wraplength=520, text='Mods Path: ', font=('Friz Quadrata Std', 18), bg='#0a0a0a',
+    browse_button = tkinter.Button(root, text='Browse', bd=1, font=('Friz Quadrata Std', 12), bg='#0a0a0a',
+                                   fg='#f0deb4', command=browse, relief=tkinter.GROOVE, activeforeground='#0f0f0f',
+                                   activebackground='#e4dfd4')
+    tkinter.Label(path_panel2, wraplength=520, text='Mods Path: ', font=('Friz Quadrata Std', 18), bg='#0a0a0a',
                   fg='#f0deb4').grid(column=0, row=3, padx=10)
-    tkinter.Label(path_panel, wraplength=520, textvariable=mod_path, font=('Friz Quadrata Std', 14), bg='#0a0a0a',
+    tkinter.Label(path_panel2, wraplength=520, textvariable=mod_path, font=('Friz Quadrata Std', 14), bg='#0a0a0a',
                   fg='#e4dfd4').grid(column=1, row=3, padx=10)
-    tkinter.Button(path_panel, text='Browse', bd=1, font=('Friz Quadrata Std', 12), bg='#0a0a0a',
-                   fg='#f0deb4', command=browse_mod, relief=tkinter.GROOVE, activeforeground='#0f0f0f',
-                   activebackground='#e4dfd4').grid(column=1, row=4, padx=20, pady=10)
+    browsemod_button = tkinter.Button(root, text='Browse', bd=1, font=('Friz Quadrata Std', 12), bg='#0a0a0a',
+                                      fg='#f0deb4', command=browse_mod, relief=tkinter.GROOVE,
+                                      activeforeground='#0f0f0f',
+                                      activebackground='#e4dfd4')
+    canvas.create_image(540, 500, image=ashes_img, state='hidden', anchor=tkinter.NW, tags='mods')
 
-    canvas.create_image(540, 450, image=ashes_img, anchor=tkinter.NW, state='hidden', tags='mods')
     ashes_panel_button1 = tkinter.Button(root, text='Restore All Files', bd=1, font=('Friz Quadrata Std', 18),
                                          bg='#0a0a0a', fg='#e4dfd4', command=reset, relief=tkinter.GROOVE,
                                          activeforeground='#0f0f0f',
