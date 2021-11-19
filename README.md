@@ -7,7 +7,8 @@ To use, simply extract into a folder and run AshesLauncher4.exe.
 
 If you have an existing launcher installation of Champion's Ashes, go to the MODS tab and click "Migrate Existing Installation".
 
-To utilize other mods when not playing Champion's Ashes, simply put the mod in a folder inside the folder called 'mods'. The new folder should contain all the dll, ini, txt etc. files and folders needed. The mods can then be chosen in the MODS tab in the launcher.
+To utilize other mods when not playing Champion's Ashes, simply put the mod in a folder inside the folder called 'mods'. 
+The new folder should contain all the dll, ini, txt etc. files and folders needed. The mods can then be chosen in the MODS tab in the launcher.
 
 ## IMPORTANT NOTE
 This mod WILL ban you if you have it enabled and launch the game.   
