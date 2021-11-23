@@ -10,6 +10,11 @@ If you have an existing launcher installation of Champion's Ashes, go to the MOD
 To utilize other mods when not playing Champion's Ashes, simply put the mod in a folder inside the folder called 'mods'. 
 The new folder should contain all the dll, ini, txt etc. files and folders needed. The mods can then be chosen in the MODS tab in the launcher.
 
+Convergence example:  
+
+![image](https://github.com/Atillart-One/AshesLauncher/blob/main/scrn.png)  
+These files are all present in a folder named "The Convergence" (can be named anything) inside the mods folder.
+
 ## IMPORTANT NOTE
 This mod WILL ban you if you have it enabled and launch the game.   
 Make sure it's disabled before using an account that you don't want banned.
