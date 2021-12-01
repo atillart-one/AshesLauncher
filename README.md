@@ -7,9 +7,9 @@ To use, simply extract into a folder and run AshesLauncher4.exe.
 
 If you have an existing launcher installation of Champion's Ashes, go to MODS and choose 'Use Existing Installation'.
 
-To utilize other mods when not playing Champion's Ashes, simply put the mods in the folder called 'mods' in the launcher folder. 
-The folder containing the mods can be changed by clicking browse Mods Path. 
-The mod folders should contain all the dll, ini, txt etc. files and folders needed. The mods can then be chosen in the MODS tab in the launcher.
+To utilize other mods when not playing Champion's Ashes, simply put the mods in the folder called 'mods' in the launcher folder.  
+The folder containing the mods can be changed by clicking browse Mods Path.  
+The mod folders should contain all the dll, ini, txt etc. files and folders needed. The mods can then be chosen in the MODS tab in the launcher.  
 
 Convergence example:  
 
