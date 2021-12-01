@@ -317,11 +317,21 @@ try:
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
                 browse()
-            elif os.path.isdir(dir_path + '/AshesLauncher/Ashes/.git') is True:
-                for file in os.listdir(dir_path + '/AshesLauncher/Ashes'):
-                    shutil.move(dir_path + '/AshesLauncher/Ashes/' + file, moddir + "/Ashes")
             else:
-                messagebox.showerror("AshesLauncher", "There is no valid installation to migrate.")
+                moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "w")
+                global moddir
+                moddir = dir_path + "/AshesLauncher"
+                moddir_file.write(moddir)
+                moddir_file.close()
+                if len(moddir) >= 83:
+                    mod_path.set("..." + moddir[-80:])
+                else:
+                    mod_path.set(moddir)
+                Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
+                mod_panel.destroy()
+                mod_creation()
+                mod_panel.place(x=50, y=150)
+
 
         def ashes():
             if os.path.isdir(moddir + "/Ashes/.git") is False:
@@ -365,8 +375,8 @@ try:
                 moddir = moddir + 'AshesLauncher/'
             moddir_file.write(moddir)
             moddir_file.close()
-            if len(moddir) >= 79:
-                mod_path.set("..." + moddir[-76:] + r"mods")
+            if len(moddir) >= 83:
+                mod_path.set("..." + moddir[-80:])
             else:
                 mod_path.set(moddir)
             Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
@@ -673,18 +683,16 @@ try:
                 if os.path.isdir(moddir + "/" + mod):
                     if mod == "Ashes":
                         radio = tkinter.Radiobutton(mod_panel, indicatoron=0, text="Champion's Ashes", variable=mod_name, value=mod,
-                                                width=40, bg='#0a0a0a', fg='#e4dfd4', selectcolor='#273355',
-                                                borderwidth=1, activeforeground='#0f0f0f', activebackground='#e4dfd4',
-                                                command=modchosen, font=("FOT-Matisse Pro M", 14), relief=tkinter.SOLID)
+                                                    width=40, bg='#0a0a0a', fg='#e4dfd4', selectcolor='#273355',
+                                                    borderwidth=1, activeforeground='#0f0f0f', activebackground='#e4dfd4',
+                                                    command=modchosen, font=("FOT-Matisse Pro M", 14), relief=tkinter.SOLID)
 
                         radio.grid()
                     else:
                         radio = tkinter.Radiobutton(mod_panel, indicatoron=0, text=mod, variable=mod_name, value=mod,
                                                     width=40, bg='#0a0a0a', fg='#e4dfd4', selectcolor='#273355',
-                                                    borderwidth=1, activeforeground='#0f0f0f',
-                                                    activebackground='#e4dfd4',
-                                                    command=modchosen, font=("FOT-Matisse Pro M", 14),
-                                                    relief=tkinter.SOLID)
+                                                    borderwidth=1, activeforeground='#0f0f0f', activebackground='#e4dfd4',
+                                                    command=modchosen, font=("FOT-Matisse Pro M", 14), relief=tkinter.SOLID)
 
                         radio.grid()
         mod_creation()
@@ -729,7 +737,7 @@ try:
                                              bg='#0a0a0a',
                                              fg='#e4dfd4', command=clean, relief=tkinter.GROOVE,
                                              activeforeground='#0f0f0f', activebackground='#e4dfd4', width=50)
-        ashes_panel_button3 = tkinter.Button(root, text='Migrate Existing Installation', bd=1,
+        ashes_panel_button3 = tkinter.Button(root, text='Use Existing Installation', bd=1,
                                              font=("FOT-Matisse Pro M", 14),
                                              bg='#0a0a0a',
                                              fg='#e4dfd4', command=migrate, relief=tkinter.GROOVE,
