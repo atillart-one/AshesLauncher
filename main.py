@@ -111,16 +111,6 @@ try:
     settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "r")
     dir_path = settings_file.read()
     settings_file.close()
-    moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "r")
-    moddir = moddir_file.read()
-    if os.path.isdir(moddir) is False:
-        moddir = os.path.abspath('.') + '/mods'
-    if moddir == '':
-        moddir = os.path.abspath('.') + '/mods'
-    if moddir == '/':
-        moddir = os.path.abspath('.') + '/mods'
-    Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
-    moddir_file.close()
     lastmod_file = open("C:/ProgramData/AshesLauncher/lastmod.txt", "r")
     lastmod = lastmod_file.read()
     lastmod_file.close()
@@ -140,13 +130,48 @@ try:
 
     tkinter.Tk.report_callback_exception = report_callback_exception
 
+    def set_game_folder():
+        root = tkinter.Tk()
+        title_icon = tkinter.PhotoImage(file=resource_path('icon.png'))
+        root.wm_title("AshesLauncher")
+        root.geometry('0x0')
+        root.iconphoto(True, title_icon)
+        root.resizable(False, False)
+        root.overrideredirect(True)
+        root.after(10, lambda: set_appwindow(root))
+        def check():
+            global dir_path
+            if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
+                if messagebox.askyesno("AshesLauncher", "Please select Game folder.") is True:
+                    settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w")
+                    dir_path = filedialog.askdirectory()
+                    if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
+                        check()
+                    else:
+                        settings_file.write(dir_path)
+                        settings_file.close()
+                else:
+                    sys.exit(0)
+        check()
+        global moddir
+        moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "r")
+        moddir = moddir_file.read()
+        if os.path.isdir(moddir) is False:
+            moddir = dir_path + '/AshesLauncher'
+        if moddir == '':
+            moddir = dir_path + '/AshesLauncher'
+        if moddir == '/':
+            moddir = dir_path + '/AshesLauncher'
+        Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
+        moddir_file.close()
+        root.destroy()
 
     def main():
         root = tkinter.Tk()
         title_icon = tkinter.PhotoImage(file=resource_path('icon.png'))
-        root.wm_title("Ashes")
-        root.geometry('1280x720')
         root.iconphoto(True, title_icon)
+        root.wm_title("AshesLauncher")
+        root.geometry('1280x720')
 
         def play_vanilla(event):
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
@@ -526,32 +551,40 @@ try:
         ashes_img = tkinter.PhotoImage(file=resource_path('ashes.png'))
 
         """BACKGROUND"""
-        try:
-            count = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher"
-                                 "/main/images/image_count.txt", timeout=3).text
+        bg = tkinter.PhotoImage(file=resource_path('bg.png'))
+        def get_bg():
+            try:
+                count = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher"
+                                     "/main/images/image_count.txt", timeout=3).text
 
-            weight = []
-            for i in range(1, int(count) + 1):
-                if i == 1:
-                    weight.append(1)
-                elif i == 2:
-                    weight.append(1)
-                else:
-                    weight.append(round(998 / ((int(count) - 2))))
-            num_img = random.choices(range(1, int(count) + 1), weights=weight)
-            response = requests.get(
-                "https://raw.githubusercontent.com/Atillart-One/AshesLauncher/main/images/"
-                + str(num_img).replace('[', '').replace(']', '') + ".png", timeout=3)
-            file = open("bg.png", "wb")
-            file.write(response.content)
-            file.close()
-            bg = tkinter.PhotoImage(file="bg.png")
-            os.remove("bg.png")
+                weight = []
+                for i in range(1, int(count) + 1):
+                    if i == 1:
+                        weight.append(1)
+                    elif i == 2:
+                        weight.append(1)
+                    else:
+                        weight.append(round(998 / ((int(count) - 2))))
+                num_img = random.choices(range(1, int(count) + 1), weights=weight)
+                response = requests.get(
+                    "https://raw.githubusercontent.com/Atillart-One/AshesLauncher/main/images/"
+                    + str(num_img).replace('[', '').replace(']', '') + ".png", timeout=3)
+                file = open("bg.png", "wb")
+                file.write(response.content)
+                file.close()
+                canvas.newbg = tkinter.PhotoImage(file="bg.png")
+                canvas.itemconfig('background', image=canvas.newbg)
+                canvas_patch.itemconfig('background', image=canvas.newbg)
+                os.remove("bg.png")
 
-        except (requests.ConnectionError, requests.Timeout, tkinter.TclError):
-            bg = tkinter.PhotoImage(file=resource_path('bg.png'))
+            except Exception:
+                return
+
+        s = threading.Thread(target=get_bg)
+        s.setDaemon(True)
+        s.start()
         """Main Canvas"""
-        canvas.create_image(0, 0, image=bg, anchor=tkinter.NW)
+        canvas.create_image(0, 0, image=bg, anchor=tkinter.NW, tags='background')
         canvas.create_image(0, 0, image=panel, anchor=tkinter.NW)
         hold = canvas.create_image(0, 0, image=hold_pic, anchor=tkinter.NW)
         home_button = canvas.create_text(60, 18, text='HOME', font=("Friz Quadrata Std", 16), fill='#ecd9ad',
@@ -594,7 +627,7 @@ try:
         canvas.create_image(-3, 135, image=patch, anchor=tkinter.NW, tags='home')
         canvas_patch = tkinter.Canvas(width=580, height=270, highlightthickness=0)
         canvas_patch.place(x=50, y=250)
-        canvas_patch.create_image(-50, -250, image=bg, anchor=tkinter.NW)
+        canvas_patch.create_image(-50, -250, image=bg, anchor=tkinter.NW, tags='background')
         canvas_patch.create_image(-50, -250, image=hold_pic, anchor=tkinter.NW)
         canvas_patch.create_image(-53, -115, image=patch, anchor=tkinter.NW)
 
@@ -737,7 +770,7 @@ try:
                                              bg='#0a0a0a',
                                              fg='#e4dfd4', command=clean, relief=tkinter.GROOVE,
                                              activeforeground='#0f0f0f', activebackground='#e4dfd4', width=50)
-        ashes_panel_button3 = tkinter.Button(root, text='Use Existing Installation', bd=1,
+        ashes_panel_button3 = tkinter.Button(root, text='Use Default Mod Location', bd=1,
                                              font=("FOT-Matisse Pro M", 14),
                                              bg='#0a0a0a',
                                              fg='#e4dfd4', command=migrate, relief=tkinter.GROOVE,
@@ -788,6 +821,7 @@ try:
 
 
     if __name__ == '__main__':
+        set_game_folder()
         main()
 except Exception:
     ctypes.windll.user32.MessageBoxW(0, traceback.format_exc(), "Error", 0)
