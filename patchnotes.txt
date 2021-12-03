@@ -481,7 +481,7 @@ Patches Shop
 -Added Kos Parasite and Simon’s Bowblade.
 
 Shrine Handmaid’s Shop
--Removed Kos Parasite, Simon’s Bowblade, Lothric War Scythe, Carthus Champion’s Blade, Kusabimaru and Ragged Knight Set. 
+-Removed Kos Parasite, Simon’s Bowblade, Lothric War Scythe, Carthus Champion’s Blade, Kusabimaru, Gravelord Sword and Ragged Knight Set. 
 
 Starting Classes - Assassin
 -Replaced Sorcerer Staff with Clandestine Catalyst. 
