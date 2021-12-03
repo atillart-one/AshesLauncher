@@ -301,7 +301,15 @@ try:
 
             def git_connect():
                 try:
-                    repo.remotes.origin.pull(progress=CloneProgress(), depth=1)
+                    try:
+                        repo.remotes.origin.pull(progress=CloneProgress(), depth=1)
+                    except Exception:
+                        try:
+                            repo.git.merge('origin/master')
+                            repo.remotes.origin.pull(progress=CloneProgress(), depth=1)
+                        except Exception:
+                            repo.git.reset('--hard', 'origin/master')
+                            repo.remotes.origin.pull(progress=CloneProgress(), depth=1)
                     canvas.itemconfig(progress, text="")
                     canvas.itemconfig('progress', state='hidden')
                     canvas.itemconfig('proglines', state='hidden')
