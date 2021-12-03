@@ -102,6 +102,7 @@ try:
         root.wm_withdraw()
         root.after(10, lambda: root.wm_deiconify())
 
+
     """
     Creates (if it doesn't exist) and reads the needed variables.
     """
@@ -134,6 +135,7 @@ try:
 
     tkinter.Tk.report_callback_exception = report_callback_exception
 
+
     def set_game_folder():
         root = tkinter.Tk()
         title_icon = tkinter.PhotoImage(file=resource_path('icon.png'))
@@ -143,6 +145,7 @@ try:
         root.resizable(False, False)
         root.overrideredirect(True)
         root.after(10, lambda: set_appwindow(root))
+
         def check():
             global dir_path
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
@@ -156,6 +159,7 @@ try:
                         settings_file.close()
                 else:
                     sys.exit(0)
+
         check()
         global moddir
         if os.path.isfile("C:/ProgramData/AshesLauncher/moddir.txt"):
@@ -172,6 +176,7 @@ try:
             moddir = dir_path + '/AshesLauncher'
         Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
         root.destroy()
+
 
     def main():
         root = tkinter.Tk()
@@ -301,15 +306,8 @@ try:
 
             def git_connect():
                 try:
-                    try:
-                        repo.remotes.origin.pull(progress=CloneProgress(), depth=1)
-                    except Exception:
-                        try:
-                            repo.git.merge('origin/master')
-                            repo.remotes.origin.pull(progress=CloneProgress(), depth=1)
-                        except Exception:
-                            repo.git.reset('--hard', 'origin/master')
-                            repo.remotes.origin.pull(progress=CloneProgress(), depth=1)
+                    repo.git.fetch('--depth=1')
+                    repo.git.merge('-X', 'theirs', '--allow-unrelated-histories', '--no-commit', 'origin/master')
                     canvas.itemconfig(progress, text="")
                     canvas.itemconfig('progress', state='hidden')
                     canvas.itemconfig('proglines', state='hidden')
@@ -371,7 +369,6 @@ try:
                 mod_panel.destroy()
                 mod_creation()
                 mod_panel.place(x=50, y=150)
-
 
         def ashes():
             if os.path.isdir(moddir + "/Ashes/.git") is False:
@@ -567,6 +564,7 @@ try:
 
         """BACKGROUND"""
         bg = tkinter.PhotoImage(file=resource_path('bg.png'))
+
         def get_bg():
             try:
                 count = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher"
@@ -612,7 +610,6 @@ try:
                                              activefill="#e4dfd4", anchor=tkinter.NW, state='hidden')
         cross = canvas.create_image(1220, 18, image=cross_pic, anchor=tkinter.NW)
 
-
         """HOME"""
         progline1 = canvas.create_rectangle(80, 630, 1045, 632, fill='#bc9a4c', width=0, tags=['proglines', 'home'],
                                             state='hidden')
@@ -654,8 +651,8 @@ try:
                                                        font=("Friz Quadrata Std", 12), anchor=tkinter.NW)
         except (requests.ConnectionError, requests.Timeout):
             patchnotes_text = canvas_patch.create_text(0, 10, text='Failed to get patch notes.'
-                                                                   ' You may be disconnected from the internet.'
-                                                       , fill='#e4dfd4', width=525, font=("Friz Quadrata Std", 12),
+                                                                   ' You may be disconnected from the internet.',
+                                                       fill='#e4dfd4', width=525, font=("Friz Quadrata Std", 12),
                                                        anchor=tkinter.NW)
 
         canvas_patch.create_image(573, 265, image=down, anchor=tkinter.SE, tags='down')
@@ -725,24 +722,30 @@ try:
 
         def mod_creation():
             global mod_panel
-            mod_panel = tkinter.LabelFrame(root, bg='#0a0a0a', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
+            mod_panel = tkinter.LabelFrame(root, bg='#141414', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
                                            font=('Friz Quadrata Std', 24))
             for mod in os.listdir(moddir):
                 if os.path.isdir(moddir + "/" + mod):
                     if mod == "Ashes":
-                        radio = tkinter.Radiobutton(mod_panel, indicatoron=0, text="Champion's Ashes", variable=mod_name, value=mod,
-                                                    width=40, bg='#0a0a0a', fg='#e4dfd4', selectcolor='#273355',
-                                                    borderwidth=1, activeforeground='#0f0f0f', activebackground='#e4dfd4',
-                                                    command=modchosen, font=("FOT-Matisse Pro M", 14), relief=tkinter.SOLID)
+                        radio = tkinter.Radiobutton(mod_panel, indicatoron=0, text="Champion's Ashes",
+                                                    variable=mod_name, value=mod,
+                                                    width=40, bg='#141414', fg='#e4dfd4', selectcolor='#273355',
+                                                    borderwidth=1, activeforeground='#0f0f0f',
+                                                    activebackground='#e4dfd4',
+                                                    command=modchosen, font=("FOT-Matisse Pro M", 14),
+                                                    relief=tkinter.SOLID)
 
                         radio.grid()
                     else:
                         radio = tkinter.Radiobutton(mod_panel, indicatoron=0, text=mod, variable=mod_name, value=mod,
-                                                    width=40, bg='#0a0a0a', fg='#e4dfd4', selectcolor='#273355',
-                                                    borderwidth=1, activeforeground='#0f0f0f', activebackground='#e4dfd4',
-                                                    command=modchosen, font=("FOT-Matisse Pro M", 14), relief=tkinter.SOLID)
+                                                    width=40, bg='#141414', fg='#e4dfd4', selectcolor='#273355',
+                                                    borderwidth=1, activeforeground='#0f0f0f',
+                                                    activebackground='#e4dfd4',
+                                                    command=modchosen, font=("FOT-Matisse Pro M", 14),
+                                                    relief=tkinter.SOLID)
 
                         radio.grid()
+
         mod_creation()
         game_path = tkinter.StringVar(root)
         mod_path = tkinter.StringVar(root)
@@ -756,38 +759,38 @@ try:
             mod_path.set(moddir)
 
         canvas.create_image(50, 535, image=paths_img, anchor=tkinter.NW, state='hidden', tags='mods')
-        path_panel1 = tkinter.LabelFrame(root, bg='#0a0a0a', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
+        path_panel1 = tkinter.LabelFrame(root, bg='#141414', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
                                          font=('Friz Quadrata Std', 24))
-        path_panel2 = tkinter.LabelFrame(root, bg='#0a0a0a', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
+        path_panel2 = tkinter.LabelFrame(root, bg='#141414', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
                                          font=('Friz Quadrata Std', 24))
-        tkinter.Label(path_panel1, text='Game Path: ', font=("FOT-Matisse Pro B", 14), bg='#0a0a0a',
+        tkinter.Label(path_panel1, text='Game Path: ', font=("FOT-Matisse Pro B", 14), bg='#141414',
                       fg='#f0deb4').grid(column=0, row=0, padx=10)
-        tkinter.Label(path_panel1, width=78, textvariable=game_path, font=("FOT-Matisse Pro M", 14), bg='#0a0a0a',
+        tkinter.Label(path_panel1, width=78, textvariable=game_path, font=("FOT-Matisse Pro M", 14), bg='#141414',
                       fg='#e4dfd4').grid(column=1, row=0, padx=0, pady=5)
-        tkinter.Button(path_panel1, text='Browse', bd=0, font=('Friz Quadrata Std', 12), bg='#0a0a0a',
+        tkinter.Button(path_panel1, text='Browse', bd=0, font=('Friz Quadrata Std', 12), bg='#141414',
                        fg='#f0deb4', command=browse, relief=tkinter.FLAT, activeforeground='#0f0f0f',
                        activebackground='#e4dfd4').grid(column=2, row=0, padx=10)
-        tkinter.Label(path_panel2, text='Mods Path: ', font=("FOT-Matisse Pro B", 14), bg='#0a0a0a',
+        tkinter.Label(path_panel2, text='Mods Path: ', font=("FOT-Matisse Pro B", 14), bg='#141414',
                       fg='#f0deb4').grid(column=0, row=0, padx=10)
-        tkinter.Label(path_panel2, width=78, textvariable=mod_path, font=("FOT-Matisse Pro M", 14), bg='#0a0a0a',
+        tkinter.Label(path_panel2, width=78, textvariable=mod_path, font=("FOT-Matisse Pro M", 14), bg='#141414',
                       fg='#e4dfd4').grid(column=1, row=0, pady=5, padx=2)
-        tkinter.Button(path_panel2, text='Browse', bd=0, font=('Friz Quadrata Std', 12), bg='#0a0a0a',
+        tkinter.Button(path_panel2, text='Browse', bd=0, font=('Friz Quadrata Std', 12), bg='#141414',
                        fg='#f0deb4', command=browse_mod, relief=tkinter.FLAT,
                        activeforeground='#0f0f0f',
                        activebackground='#e4dfd4').grid(column=2, row=0, padx=10)
         canvas.create_image(610, 100, image=ashes_img, state='hidden', anchor=tkinter.NW, tags='mods')
 
         ashes_panel_button1 = tkinter.Button(root, text='Restore All Files', bd=1, font=("FOT-Matisse Pro M", 14),
-                                             bg='#0a0a0a', fg='#e4dfd4', command=reset, relief=tkinter.GROOVE,
+                                             bg='#141414', fg='#e4dfd4', command=reset, relief=tkinter.GROOVE,
                                              activeforeground='#0f0f0f',
                                              activebackground='#e4dfd4', width=50)
         ashes_panel_button2 = tkinter.Button(root, text='Remove Extra Files', bd=1, font=("FOT-Matisse Pro M", 14),
-                                             bg='#0a0a0a',
+                                             bg='#141414',
                                              fg='#e4dfd4', command=clean, relief=tkinter.GROOVE,
                                              activeforeground='#0f0f0f', activebackground='#e4dfd4', width=50)
         ashes_panel_button3 = tkinter.Button(root, text='Use Default Mod Location', bd=1,
                                              font=("FOT-Matisse Pro M", 14),
-                                             bg='#0a0a0a',
+                                             bg='#141414',
                                              fg='#e4dfd4', command=migrate, relief=tkinter.GROOVE,
                                              activeforeground='#0f0f0f',
                                              activebackground='#e4dfd4', width=50)
