@@ -1,29 +1,497 @@
-VERSION 1.8.1
+VERSION 1.9
 
 --------------------------
+*Summary 
 
-Summary
-- Bug Fixes
+Map lighting fixes
+New Trick Weapons
+New original Weapons
+Multiple Sorceries rebalanced
+DS1 Dragon Form
+Various PvP balance changes
 
 --------------------------
+*New Additions 
 
-Bug fixes
+Beasthunter Saif
+Carthus Champion Blade
+Ceremonial Quicksilver Sword
+Ceremonial Quills 
+Clandestine Catalyst
+Lothric Champion's Greatsword
+Threaded Cane
+Stone Dragon Set
+Demon’s Seal 
+Rose Quartz Polish
+Spirit Amethyst Polish 
+Frosting Sherbet
+Lime Sherbet 
 
-Kos Parasite 
-- Lost version now has a 20 faith requirement instead of 20 int.
+--------------------------
+*General Changes
 
-Gundyr's Halberd
-- Fixed model
++Armour
 
-Lothric war scythe
-- Fixed a bug that allowed 1H second R2 to hit twice when close
+Dragon Set
+-Updated description.
 
-Bloodlust
-- Fixed a bug that allowed 1H second R2 to have no hitboxes
-- Fixed Weapon Art descriptions
+Eastern General Set
+-Updated model.
 
-Soldering Iron
-- Fixed Weapon Art descriptions
+Old Bell Helm
+-Changed stats to that of Aristocrat Mask's.
 
-High Wall and Irithyll Maps
-- Fixed texture bugs
+
++Axes
+
+Dragonslayer’s Axe
+-(Bug Fix) Removed a special infusion option.
+
+Eleonora
+-Updated description. 
+
+
++Curved Greatswords
+
+Backstep + R2
+-Now has poise startup at frame 10.
+
+
++Chimes
+
+Deep Chime
+-Reduced Int/Fth requirement to 15/15.
+
+
++Dragon Form
+
+Dragon Form 
+-(Bug Fix) Stamina bonus no longer retained after death. 
+
+Tainted Dragon Stones
+-Updated transformation visual with DS1 Dragon Form.
+-Updated description.
+
+
++Fists
+
+Dark Hand
+-WA grab now does damage based equally on physical and dark AR.
+-Reduces dark motion value of WA.
+-Increased Str and Dex scaling.
+-Decreased Int and Faith scaling.
+-Significantly nerfed WA recovery to 21 frames.
+
+
++Gestures
+
+Point Down
+-Added instability and counter frames.
+
+Welcome
+-Now makes the player becomes invisible. 
+
+
++Greataxes
+
+R1s
+-Slightly increased tracking.
+
+R2s
+-Slightly increased tracking.
+
+Backstep + R2
+-Now has poise startup at frame 10.
+
+Black Knight Greataxe 
+-1H Charged R2 now knockdown.
+
+
++Great Hammers
+
+Backstep + R2
+-Now has poise startup at frame 10.
+
+Fast WA cancel into 2H R1
+-Sped up by 3 frames. 
+
+Morne Greathammer 
+-Updated description.
+
+Quakestone Hammer 
+-Sped up WA by 10 frames.
+-Sped up WA cancel.
+
+
++Greatswords
+
+Backstep + R2
+-Now has poise startup at frame 10.
+
+Loyce Greatsword 
+-Sped up R1 active frames startup by 1 frame.
+-Added extension skip.
+-(Bug Fix) WA R1 - R2 now combo correctly.
+
+
++Halberds
+
+Red Hilted Halberd
+-Changed WA Stance animation.
+
+
++Items
+
+Black Character Tendency 
+-(Bug Fix) Effect no longer goes away when switching offhand weapons. 
+
+White Character Tendency 
+-(Bug Fix) Effect no longer goes away when switching offhand weapons. 
+-Changed soul gain penalty to 20% of original soul gain. 
+
+Executioner Gloves 
+-Increased FP cost to 60 FP.
+-Increased stamina cost to 75 stamina.
+
+
++Katanas
+
+Kusabimaru
+-Updated SFX.
+
+
++Miracles
+
+Divine Spears of Judgement. 
+-Increased recovery by 5 frames.
+
+Force
+-Reduced Fth requirement to 12.
+
+Way of White Corona
+-Removed ability to feint. 
+
+Wrath of the God
+-Removed ability to feint. 
+-Sped up startup to 29 frames.
+-Sped up hyperarmor startup to 15 frames.
+-Can now walk during cast animation. 
+
+
+
+
++Pyromancies
+
+Black Serpent
+-Increased recovery by 5 frames.
+
+Carthus Beacon
+-Reduced Int/Fth requirement to 10/10.
+
+Sacred Flame
+-(Bug Fix) Fixed dealing low damage when casted with Firelink CS. 
+
+
++Reapers
+
+Chosen Undead’s Scythe 
+-(Bug Fix) Can no longer be used for Halberd Powerstance.
+-Updated icon.
+
+Lothric War Scythe
+-Updated model.
+-Reduced weight to 7.
+-Reduced base AR to 115.
+-Increased Str scaling.
+-Decreased stamina consumption.
+-Reduced Str requirement to 20
+-Reduced Dex requirement to 12
+-Reduced poise damage, poise health and stamina damage.
+-Changed full charged 2H R2 to ultra stun (was knockdown)
+
+
++Rolling
+
+<30% Rolling
+-Added 5 frames of instability after i-frames.
+
+
++Rings
+
+All Rings
+-Updated description to show detailed value of effect. 
+
+Dusk Crown Ring
+-Now also provides 30 virtual dexterity for spell casting. 
+
+
++Sorceries
+
+Aural Decoy
+-Reduced Int requirement to 10.
+-Increased FP cost to 50 FP.
+-Increased range. 
+-Can now draw aggro like alluring skull.
+
+Cast Light
+-Reduced Int requirement to 10.
+
+Crystal Magic Weapon
+-Increased FP cost to 50. 
+-Increased Int requirement to 60.
+-Increased required att slots to 2. 
+-Applies a stackable -2 magic defense, -1% magic absorption debuff on hit.
+-Duration is no longer fixed, instead continuously draining 2FP/s and lasting until FP runs out.
+
+Dark Edge
+-Removed ability to feint. 
+-Sped up startup to 23 frames.
+-Increased active frames to 6 frames.
+-Sped up hyperarmor startup to 13 frames.
+-Increased hitstun to flatten. 
+-Doubled poise health multiplier.
+
+Great Magic Weapon
+-Increased FP cost to 45.
+-Increased Int requirement to 30.
+-Increased added Magic AR to 95% of Spell Buff. 
+
+Old Moonlight
+-Removed ability to feint.
+-Doubled charged bullet wave lifetime. 
+-Increased charge bullet explosion lifetime.
+-Improved vertical free aim.
+-Added 100ms delay between swing and projectile for charged and uncharged.
+
+
+Soul Greatsword
+-Removed ability to feint. 
+-Increased active frames to 7 frames.
+-Sped up cancel into other spells by 4 frames.
+
+
++Spears
+
+Dragonslayer Swordspear (Sword)
+-New 1H R1.
+-New 1H Forward + R2.
+-New 1H Forward + R1.
+-New Weapon Art.
+-Slowed down 2H Rolling R1 by 2 frames.
+-(Bug Fix) Fixed L1 attack in offhand not costing stamina.
+-Updated description.
+
+
++Staves
+
+Mendicant Staff 
+-New WA summoning homing orbs like the Manserpent Summoner’s attack.
+-Added 25 flat fire and magic AR.       
+-Updated description.
+
+
++Thrusting Swords
+
+Crow Quills 
+-Standardized recovery for all directions.
+-Decreased WA tracking.
+-Increased WA bullets lifetime
+-Reduced WA hit radius.
+-Reduced WA bullet speed. 
+
+Estoc 
+-(Bug Fix) Removed a special infusion option.
+
+
++Trick Weapons
+
+Beast Cutter
+-Added feint into R1 to UT Running R2.
+-Slightly nerfed tracking of Running R2 (both forms)
+
+Bloodletter
+-Reduced WA motion value by 10%.
+
+Kos Parasite
+-Increased active frames of R1s to at least 7 frames.
+-Increased feint window of R2
+-Increased HA of jump attack to 12 frames.
+-Jump attacks now knock down.
+-Increased poise health of WA.
+-Decreased stamina cost of WA.
+-Increase poise damage and stamina damage.
+-T TA now applies maggot debuff.
+-Updated description.
+
+Saw Cleaver
+-Reduced Str requirement to 8.
+-Reduced Dex requirement to 7.
+
+Simon’s Bowblade
+-Reduced base bleed buildup to 15.
+-Increased arrow attacks’ auxiliary motion value.
+
+
++Ultra Greatswords
+
+Backstep + R2
+-Now has poise startup at frame 10.
+
+Abyssal Greatsword
+-(Bug Fixed) 2H R1s no longer parriable. 
+
+Astora Greatsword
+-(Bug Fixed) Fixed offhand weapon moveset getting changed with AGS in main hand.
+
+Black Knight Greatsword 
+-1H Charged R2 now knockback.
+
+Embered Farron Greatsword
+-(Bug Fix) Can no longer be used for UGS Powerstance.
+-Increased fire trail hitbox.
+-Increased fire trail motion value.
+
+Lothric Knight Greatsword
+-Reverted to pre-1.7 state. 
+-Slightly reduced physical AR on Sacred infusion. 
+
+
+
+--------------------------
+*PvE Changes
+
++Areas
+
+Cemetery of Ash
+-Added a NPC wielding Saw Cleaver near the first Hollow,
+
+Crucifixion Woods
+-(Bug Fix) Removed barrels from trees.
+
+Catacombs of Carthus
+-Added Skeleton NPC wielding Carthus Champion’s Blade that can drop the weapon and skeleton set pieces.
+
+Cathedral of the Deep
+-Added 5 Ragged Knights wearing different pieces of Ragged Knight set on the path between Crystal Sage and Cathedral of the Deep. 
+
+Corvian Settlement 
+-Placed Ceremonial Quills on the same corpse as Way of White Corona.
+
+Farron Keep
+-(Bug Fix) Fixed missing map pieces.
+-(Bug Fix) Removed barrels from trees.
+-Added a Hunter NPC wielding Beasthunter Saif near Farron Keep Perimeter that has the following item drop pool: 20% Beasthunter Saif, 10% Ludwig Rifle
+-Added Asterios above the Old Wolf duel platform. 
+
+Firelink Shrine
+-Place Old Bell Helm near the elevator on the tower. 
+-Adjusted lighting. 
+
+High Wall of Lothric
+-(Bug Fix) Fixed an inescapable player trap.
+-(Bug Fix) Fixed various lighting issues. 
+
+Irithyll of the Boreal Valley & Anor Londo
+-Placed Ceremonial Quicksilver Sword in a chest in Darkmoon Tomb, on the opposite side of Reversal Ring.
+-Added a Hunter NPC wielding Thread Cane that has the following item drop pool: 20% Uncanny Threaded Cane, 20% Lost Threaded Cane, 10% Repeating Pistol
+
+Lothric Castle
+-Placed Lothric Champion’s Greatsword near the vanilla spot of Lothric Castle bonfire. 
+
+Road of Sacrifice 
+-(Bug Fix) Removed barrels from trees.
+
+Smouldering Lake
+-(Bug Fix) Fixed double trees.
+
+
++Enemies
+
+Abyss Watchers
+-Increased HP by 20%
+-Increased startup of fireskating attacks by 10 frames.
+-Additional vfx and sound effects on startup of fireskating attacks.
+-Increased recovery of fireskating attacks.
+-Reduced bullet size of fire carpets.
+
+Battle Monk
+-No longer respawns after death.
+-Added Monk Straw Hat to guaranteed drop pool. 
+
+Capra Demons (Undead Settlement)
+-Replaced Pyromancy Flame with Pyromancer's Parting Flame
+-The one in Greatwood boss room and his 2 dogs are now immune to fall damage.
+
+Crystal Sage (Grand Archive)
+-(Bug Fix) Fixed invisible crystal ball.
+
+Desert Pyromancer Zoey
+-Can no longer spell feint. 
+
+Deep Accursed
+-Receive 50% less damage from riposte attack. 
+
+Hawkwood the Deserter (last encounter)
+-Replaced Farron Greatsword with Embered Farron Greatsword.
+-Replaced armors with a combination of Stone Dragon set and Undead Legion Set. 
+
+Lothric Knights (Grand Archive)
+-(Bug Fix) Fixed two immobilized Lothric Knights.
+
+Manserpent Summoner 
+-Increased Mendicant Staff drop rate from to 10%
+
+Knights of Vows
+-Increased HP by 30%
+
+Sewer Centipedes
+-Reduced damage of blender attack.
+
+Skeleton NPCs (CoC)
+-Improved AI.
+-Reduced soul gain to 2000 souls each. 
+
+Starved Hounds (Capra Demon friends)
+-Reduced HP to 220.
+
+Twin Princes 
+-Reduced invisibility for all animations.
+-Increased recovery of all dodge animations.
+-Increased recovery for certain teleport attacks.
+
+Vordt of the Boreal Valley 
+-Charge breath has less lingering active frames.
+
+
++Other
+
+Irina’s Shop
+-Added Divine Bolt to base shop.
+-Added Divine Spear of Judgement to Braille Divine Tome of Carim.
+
+Ludleth’s Transposition Shop
+-Added Demon's Seal as transposition option from Soul of a Tormented Knight.
+
+Orbeck of Vinheim
+-Replaced Sorcerer Staff with Clandestine Catalyst.
+-Added Clandestine Catalyst to guaranteed drop upon death. 
+
+Patches Shop
+-Removed Monk Straw Hat, Hunter Blunderbuss, Ludwig Rifle, Saw Cleaver, Repeating Pistol.
+-Added Kos Parasite and Simon’s Bowblade.
+
+Shrine Handmaid’s Shop
+-Removed Kos Parasite, Simon’s Bowblade, Lothric War Scythe, Carthus Champion’s Blade, Kusabimaru and Ragged Knight Set. 
+
+Starting Classes - Assassin
+-Replaced Sorcerer Staff with Clandestine Catalyst. 
+
+
+
+
+
+
+
+
+
+
