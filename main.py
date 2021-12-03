@@ -105,15 +105,19 @@ try:
     """
     Creates (if it doesn't exist) and reads the needed variables.
     """
-    Path("C:/ProgramData/AshesLauncher/settings.txt").touch(exist_ok=True)
-    Path("C:/ProgramData/AshesLauncher/moddir.txt").touch(exist_ok=True)
-    Path("C:/ProgramData/AshesLauncher/lastmod.txt").touch(exist_ok=True)
-    settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "r")
-    dir_path = settings_file.read()
-    settings_file.close()
-    lastmod_file = open("C:/ProgramData/AshesLauncher/lastmod.txt", "r")
-    lastmod = lastmod_file.read()
-    lastmod_file.close()
+    Path("C:/ProgramData/AshesLauncher").mkdir(exist_ok=True)
+    if os.path.isfile("C:/ProgramData/AshesLauncher/settings.txt"):
+        settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "r")
+        dir_path = settings_file.read()
+        settings_file.close()
+    else:
+        dir_path = os.path.abspath('.')
+    if os.path.isfile("C:/ProgramData/AshesLauncher/lastmod.txt"):
+        lastmod_file = open("C:/ProgramData/AshesLauncher/lastmod.txt", "r")
+        lastmod = lastmod_file.read()
+        lastmod_file.close()
+    else:
+        lastmod = ''
 
 
     def onObjectClick(event):
@@ -143,7 +147,7 @@ try:
             global dir_path
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                 if messagebox.askyesno("AshesLauncher", "Please select Game folder.") is True:
-                    settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w")
+                    settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w+")
                     dir_path = filedialog.askdirectory()
                     if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                         check()
@@ -154,8 +158,12 @@ try:
                     sys.exit(0)
         check()
         global moddir
-        moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "r")
-        moddir = moddir_file.read()
+        if os.path.isfile("C:/ProgramData/AshesLauncher/moddir.txt"):
+            moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "r")
+            moddir = moddir_file.read()
+            moddir_file.close()
+        else:
+            moddir = ''
         if os.path.isdir(moddir) is False:
             moddir = dir_path + '/AshesLauncher'
         if moddir == '':
@@ -163,7 +171,6 @@ try:
         if moddir == '/':
             moddir = dir_path + '/AshesLauncher'
         Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
-        moddir_file.close()
         root.destroy()
 
     def main():
@@ -343,7 +350,7 @@ try:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
                 browse()
             else:
-                moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "w")
+                moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "w+")
                 global moddir
                 moddir = dir_path + "/AshesLauncher"
                 moddir_file.write(moddir)
@@ -378,7 +385,7 @@ try:
                 os.remove(dir_path + "/lazyLoad.ini")
 
         def browse():
-            settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w")
+            settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w+")
             global dir_path
             dir_path = filedialog.askdirectory()
             settings_file.write(dir_path)
@@ -389,7 +396,7 @@ try:
                 game_path.set(dir_path)
 
         def browse_mod():
-            moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "w")
+            moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "w+")
             global moddir
             moddir = filedialog.askdirectory() + '/'
             if os.path.isdir(moddir) is False:
@@ -704,7 +711,7 @@ try:
         canvas.create_image(50, 100, image=mods_img, anchor=tkinter.NW, state='hidden', tags='mods')
 
         def modchosen():
-            lastmod_file = open("C:/ProgramData/AshesLauncher/lastmod.txt", "w")
+            lastmod_file = open("C:/ProgramData/AshesLauncher/lastmod.txt", "w+")
             lastmod_file.write(mod_name.get())
             lastmod_file.close()
 
