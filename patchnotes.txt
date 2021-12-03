@@ -197,6 +197,7 @@ Sacred Flame
 Chosen Undead’s Scythe 
 -(Bug Fix) Can no longer be used for Halberd Powerstance.
 -Updated icon.
+-Updated infusion names.
 
 Lothric War Scythe
 -Updated model.
