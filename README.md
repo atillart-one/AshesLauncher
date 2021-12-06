@@ -5,14 +5,16 @@ A launcher for the Dark Souls III mod Champion's Ashes, made by atillart#4807.
 ## Instructions
 To use, simply extract into a folder and run AshesLauncher4.exe.
 
-To utilize other mods when not playing Champion's Ashes, simply put the mods in their own folders inside a folder of your choosing (directs to 'AshesLauncher' present in the Game folder by default).  The folder containing the mods can be changed by clicking browse Mods Path.    
+If you have an older non-launcher manual install, delete the AshesLauncher folder from your Game folder.
 
-The folders for the mods themselves should contain all the dll, ini, txt etc. files and folders needed. The mods can then be chosen in the MODS tab in the launcher.  
+To utilize other mods when not playing Champion's Ashes, simply put the mods in the folder called 'mods' in the launcher folder. 
+The folder containing the mods can be changed by clicking browse Mods Path. 
+The mod folders should contain all the dll, ini, txt etc. files and folders needed. The mods can then be chosen in the MODS tab in the launcher.
 
 Convergence example:  
 
 ![image](https://github.com/Atillart-One/AshesLauncher/blob/main/scrn.png)  
-These files are all present in a folder named 'The Convergence' (can be named anything) inside the 'AshesLauncher' folder.
+These files are all present in a folder named "The Convergence" (can be named anything) inside the mods folder.
 
 ## IMPORTANT NOTE
 This mod WILL ban you if you have it enabled and launch the game.   

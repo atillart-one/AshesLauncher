@@ -208,6 +208,49 @@ try:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
                 browse()
             else:
+                launch()
+
+        def vanilla():
+            delete()
+            webbrowser.open('steam://rungameid/374320')
+
+        def launch():
+            delete()
+            if Path(dir_path) in Path(moddir).parents:
+                if os.path.islink(dir_path + '/mods') is True:
+                    os.unlink(dir_path + '/mods')
+
+                for modfiles in os.listdir(moddir + '/' + mod_name.get()):
+                    if modfiles.endswith('.txt') is True:
+                        shutil.copy(f'{moddir}/{mod_name.get()}/{modfiles}', dir_path + '/' + modfiles)
+                    if modfiles.endswith('.ini') is True:
+                        shutil.copy(f'{moddir}/{mod_name.get()}/{modfiles}', dir_path + '/' + modfiles)
+                if mod_name.get() == 'Ashes':
+                    config = configparser.ConfigParser()
+                    config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
+                    config.set('files', 'modOverrideDirectory',
+                                   f'"/{moddir}/Ashes/_ashes"'.replace(f'{dir_path}/', ''))
+                    with open(dir_path + '/modengine.ini', 'w+') as file:
+                        config.write(file)
+                    print(os.path.isdir(f'{moddir}/{mod_name.get()}/{modfiles}'))
+                elif os.path.isfile(moddir + '/' + mod_name.get() + '/modengine.ini ') is True:
+                    for modfiles in os.listdir(moddir + '/' + mod_name.get()):
+                        if os.path.isdir(f'{moddir}/{mod_name.get()}/{modfiles}'):
+                                config = configparser.ConfigParser()
+                                config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
+                                config.set('files', 'modOverrideDirectory',
+                                           f'"/{moddir}/{mod_name.get()}/{modfiles}"'.replace(f'{dir_path}/', ''))
+                                with open(dir_path + '/modengine.ini', 'w+') as file:
+                                    config.write(file)
+
+                    shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
+                    config = configparser.ConfigParser()
+                    config.read(os.path.abspath(f'{dir_path}/lazyLoad.ini'))
+                    config.set('LAZYLOAD', 'dllModFolderName',
+                               f'{moddir}/{mod_name.get()}'.replace(f'{dir_path}/', ''))
+                    with open(dir_path + '/lazyLoad.ini', 'w+') as file:
+                        config.write(file)
+            else:
                 if os.path.islink(dir_path + '/mods') is True:
                     os.unlink(dir_path + '/mods')
                 elif os.path.isdir(dir_path + '/mods') is True:
@@ -215,24 +258,30 @@ try:
                 os.symlink(os.path.abspath(moddir + "/" + mod_name.get()), dir_path + r'/mods',
                            target_is_directory=True)
 
-                for modfiles in os.listdir(moddir + 'mods/' + mod_name.get()):
+                for modfiles in os.listdir(moddir + '/' + mod_name.get()):
                     if modfiles.endswith('.txt') is True:
                         shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
                     if modfiles.endswith('.ini') is True:
                         shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
-                    if os.path.isdir(moddir + 'mods/' + mod_name.get() + '/' + modfiles) is True:
-                        config = configparser.ConfigParser()
-                        config.read(os.path.abspath(moddir + 'mods/{}/modengine.ini'.format(mod_name.get())))
-                        config.set('files', 'modOverrideDirectory', '"/mods/{}"'.format(modfiles))
-                        with open(dir_path + '/modengine.ini', 'w+') as file:
-                            config.write(file)
+                if mod_name.get() == 'Ashes':
+                    config = configparser.ConfigParser()
+                    config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
+                    config.set('files', 'modOverrideDirectory',
+                                   '"/mods/_ashes"')
+                    with open(dir_path + '/modengine.ini', 'w+') as file:
+                        config.write(file)
+                elif os.path.isfile(moddir + '/' + mod_name.get() + '/modengine.ini ') is True:
+                    for modfiles in os.listdir(moddir + '/' + mod_name.get()):
+                        if os.path.isdir(f'{moddir}/{mod_name.get()}/{modfiles}'):
+                                config = configparser.ConfigParser()
+                                config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
+                                config.set('files', 'modOverrideDirectory',
+                                           f'"/mods/{modfiles}"')
+                                with open(dir_path + '/modengine.ini', 'w+') as file:
+                                    config.write(file)
 
-                shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
-                shutil.copy("files/lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
-                webbrowser.open('steam://rungameid/374320')
-
-        def vanilla():
-            delete()
+            shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
+            shutil.copy("files/lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
             webbrowser.open('steam://rungameid/374320')
 
         class CloneProgress(git.RemoteProgress):
@@ -263,27 +312,7 @@ try:
                     canvas.itemconfig(progress, text="")
                     canvas.itemconfig('progress', state='hidden')
                     canvas.itemconfig('proglines', state='hidden')
-                    if os.path.islink(dir_path + '/mods') is True:
-                        os.unlink(dir_path + '/mods')
-                    elif os.path.isdir(dir_path + '/mods') is True:
-                        os.rmdir(dir_path + '/mods')
-                    os.symlink(os.path.abspath(moddir + "/Ashes"), dir_path + r'/mods',
-                               target_is_directory=True)
-                    for modfiles in os.listdir(moddir + '/' + mod_name.get()):
-                        if modfiles.endswith('.txt') is True:
-                            shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
-                        if modfiles.endswith('.ini') is True:
-                            shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
-                        if os.path.isdir(moddir + '/' + mod_name.get() + '/' + modfiles) is True:
-                            config = configparser.ConfigParser()
-                            config.read(os.path.abspath(moddir + '/{}/modengine.ini'.format(mod_name.get())))
-                            config.set('files', 'modOverrideDirectory', '"/mods/_ashes"')
-                            with open(dir_path + '/modengine.ini', 'w+') as file:
-                                config.write(file)
-                    shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
-                    shutil.copy("files/lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
-                    webbrowser.open('steam://rungameid/374320')
-
+                    launch()
                 except Exception:
                     state = messagebox.askretrycancel('AshesLauncher', "There was an error installing. Retry?")
                     if state is True:
@@ -311,27 +340,7 @@ try:
                     canvas.itemconfig(progress, text="")
                     canvas.itemconfig('progress', state='hidden')
                     canvas.itemconfig('proglines', state='hidden')
-                    if os.path.islink(dir_path + '/mods') is True:
-                        os.unlink(dir_path + '/mods')
-                    elif os.path.isdir(dir_path + '/mods') is True:
-                        os.rmdir(dir_path + '/mods')
-
-                    os.symlink(os.path.abspath(moddir + "/Ashes"), dir_path + r'/mods',
-                               target_is_directory=True)
-                    for modfiles in os.listdir(moddir + '/' + mod_name.get()):
-                        if modfiles.endswith('.txt') is True:
-                            shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
-                        if modfiles.endswith('.ini') is True:
-                            shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
-                        if os.path.isdir(moddir + '/' + mod_name.get() + '/' + modfiles) is True:
-                            config = configparser.ConfigParser()
-                            config.read(os.path.abspath(moddir + '/{}/modengine.ini'.format(mod_name.get())))
-                            config.set('files', 'modOverrideDirectory', '"/mods/_ashes"')
-                            with open(dir_path + '/modengine.ini', 'w+') as file:
-                                config.write(file)
-                    shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
-                    shutil.copy("files/lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
-                    webbrowser.open('steam://rungameid/374320')
+                    launch()
                 except Exception:
                     state = messagebox.askretrycancel('AshesLauncher', "There was an error updating. Retry?")
                     if state is True:
@@ -403,13 +412,13 @@ try:
         def browse_mod():
             moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "w+")
             global moddir
-            moddir = filedialog.askdirectory() + '/'
+            moddir = filedialog.askdirectory()
             if os.path.isdir(moddir) is False:
-                moddir = os.path.abspath('.') + '/'
+                moddir = os.path.abspath('.')
             if moddir == '/':
-                moddir = os.path.abspath('.') + '/'
+                moddir = os.path.abspath('.')
             if os.path.isfile(moddir + 'DarkSoulsIII.exe') is True:
-                moddir = moddir + 'AshesLauncher/'
+                moddir = moddir + 'AshesLauncher'
             moddir_file.write(moddir)
             moddir_file.close()
             if len(moddir) >= 83:
@@ -615,7 +624,7 @@ try:
                                             state='hidden')
         progline2 = canvas.create_rectangle(80, 648, 1045, 650, fill='#bc9a4c', width=0, tags=['proglines', 'home'],
                                             state='hidden')
-        canvas.create_rectangle(80, 632, 80, 648, fill='#ebd7aa', width=0, state='hidden',
+        canvas.create_rectangle(80, 634, 80, 646, fill='#ebd7aa', width=0, state='hidden',
                                 tags=['progress', 'proglines', 'home'])
         progress = canvas.create_text(612, 610, text='', fill='#e4dfd4', font=('Friz Quadrata Std', 16), tags='home')
         play_button = canvas.create_image(1282, 600, image=play, anchor=tkinter.NE, tags='home')
@@ -686,7 +695,7 @@ try:
                             state='hidden')
 
         canvas.create_text(150, 280,
-                           text='The preset closest to the vanilla game. The least graphically demanding preset.\n\n\n'
+                           text='The preset closest to the vanilla game. The least graphically demanding preset.\n\n'
                                 'For those who prefer lighting closer to vanilla or have issues running the '
                                 'other presets.',
                            fill='#e4dfd4', width=250,
@@ -698,7 +707,7 @@ try:
                            fill='#e4dfd4', width=250,
                            font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
         canvas.create_text(890, 280,
-                           text="The intended preset for Ashes. The most graphically demanding preset.\n\n\n"
+                           text="The intended preset for Ashes. The most graphically demanding preset.\n\n"
                                 'For those who want to experience the new graphical changes at their finest.',
                            fill='#e4dfd4', width=250,
                            font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
