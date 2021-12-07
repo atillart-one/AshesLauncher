@@ -28,10 +28,12 @@ if num_processes < 3: ctypes.WinDLL('user32').ShowWindow(kernel32.GetConsoleWind
 os.system("taskkill /f /im DarkSoulsIII.exe")
 print('Ignore ERROR: The process "DarkSoulsIII.exe" not found if it pops up.')
 try:
-    os.environ['GIT_PYTHON_GIT_EXECUTABLE'] = os.path.abspath('.') + "/files/cmd/git.exe"
-
-    import git
-
+    if os.path.isfile(os.path.abspath('.') + "/files/Git/cmd/git.exe") is True:
+        os.environ['GIT_PYTHON_GIT_EXECUTABLE'] = os.path.abspath('.') + "/files/Git/cmd/git.exe"
+        import git
+        git_enabled = 1
+    else:
+        git_enabled = 0
     FR_PRIVATE = 0x10
     FR_NOT_ENUM = 0x20
 
@@ -183,7 +185,7 @@ try:
         title_icon = tkinter.PhotoImage(file=resource_path('icon.png'))
         root.iconphoto(True, title_icon)
         root.wm_title("AshesLauncher")
-        root.geometry('1280x720')
+        root.geometry(f'1280x720+{int(root.winfo_screenwidth()/2 - 540)}+{int(root.winfo_screenheight()/2 - 360)}')
 
         def play_vanilla(event):
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
@@ -225,23 +227,16 @@ try:
                         shutil.copy(f'{moddir}/{mod_name.get()}/{modfiles}', dir_path + '/' + modfiles)
                     if modfiles.endswith('.ini') is True:
                         shutil.copy(f'{moddir}/{mod_name.get()}/{modfiles}', dir_path + '/' + modfiles)
-                if mod_name.get() == 'Ashes':
+                if os.path.isfile(moddir + '/' + mod_name.get() + '/modengine.ini ') is True:
                     config = configparser.ConfigParser()
                     config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
+                    default_dir = config['files']['modOverrideDirectory'].replace('"',
+                                                                                  '').replace(r"\AshesLauncher\Ashes",
+                                                                                              "")
                     config.set('files', 'modOverrideDirectory',
-                               f'"/{moddir}/Ashes/_ashes"'.replace(f'{dir_path}/', ''))
+                               fr'"\{moddir}\{mod_name.get()}{default_dir}"'.replace(f'{dir_path}/', ''))
                     with open(dir_path + '/modengine.ini', 'w+') as file:
                         config.write(file)
-                    print(os.path.isdir(f'{moddir}/{mod_name.get()}/{modfiles}'))
-                elif os.path.isfile(moddir + '/' + mod_name.get() + '/modengine.ini ') is True:
-                    for modfiles in os.listdir(moddir + '/' + mod_name.get()):
-                        if os.path.isdir(f'{moddir}/{mod_name.get()}/{modfiles}'):
-                            config = configparser.ConfigParser()
-                            config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
-                            config.set('files', 'modOverrideDirectory',
-                                       f'"/{moddir}/{mod_name.get()}/{modfiles}"'.replace(f'{dir_path}/', ''))
-                            with open(dir_path + '/modengine.ini', 'w+') as file:
-                                config.write(file)
 
                 shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
                 config = configparser.ConfigParser()
@@ -263,103 +258,102 @@ try:
                         shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
                     if modfiles.endswith('.ini') is True:
                         shutil.copy(dir_path + '/mods/' + modfiles, dir_path + '/' + modfiles)
-                if mod_name.get() == 'Ashes':
+                if os.path.isfile(moddir + '/' + mod_name.get() + '/modengine.ini ') is True:
                     config = configparser.ConfigParser()
                     config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
+                    default_dir = config['files']['modOverrideDirectory'].replace('"',
+                                                                                  '').replace(r"\AshesLauncher\Ashes",
+                                                                                              "")
                     config.set('files', 'modOverrideDirectory',
-                               '"/mods/_ashes"')
+                               f'"/mods/{default_dir}"'.replace(f'{dir_path}/', ''))
                     with open(dir_path + '/modengine.ini', 'w+') as file:
                         config.write(file)
-                elif os.path.isfile(moddir + '/' + mod_name.get() + '/modengine.ini ') is True:
-                    for modfiles in os.listdir(moddir + '/' + mod_name.get()):
-                        if os.path.isdir(f'{moddir}/{mod_name.get()}/{modfiles}'):
-                            config = configparser.ConfigParser()
-                            config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
-                            config.set('files', 'modOverrideDirectory',
-                                       f'"/mods/{modfiles}"')
-                            with open(dir_path + '/modengine.ini', 'w+') as file:
-                                config.write(file)
 
                 shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
             shutil.copy("files/lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
             webbrowser.open('steam://rungameid/374320')
 
-        class CloneProgress(git.RemoteProgress):
-            def __init__(self):
-                super().__init__()
-                canvas.itemconfig('proglines', state='normal')
-                canvas.itemconfig(progress, state='normal')
+        if git_enabled == 1:
+            class CloneProgress(git.RemoteProgress):
+                def __init__(self):
+                    super().__init__()
+                    canvas.itemconfig('proglines', state='normal')
+                    canvas.itemconfig(progress, state='normal')
+                    global installing
+                    installing = 1
+
+                def update(self, op_code, cur_count, max_count=None, message=''):
+                    x = cur_count * 964 // max_count
+                    canvas.coords('progress', canvas.coords('progress')[0], canvas.coords('progress')[1],
+                                  canvas.coords('progress')[0] + x,
+                                  canvas.coords('progress')[3])
+                    canvas.itemconfig(progress, text=self._cur_line)
+                    if canvas.coords('progress')[2] == canvas.coords('progress')[0] + 964:
+                        canvas.itemconfig(progress, text="Unpacking...")
+
+            def install():
+                canvas.itemconfig(play_button, state='disabled')
                 global installing
-                installing = 1
 
-            def update(self, op_code, cur_count, max_count=None, message=''):
-                x = cur_count * 964 // max_count
-                canvas.coords('progress', canvas.coords('progress')[0], canvas.coords('progress')[1],
-                              canvas.coords('progress')[0] + x,
-                              canvas.coords('progress')[3])
-                canvas.itemconfig(progress, text=self._cur_line)
-                if canvas.coords('progress')[2] == canvas.coords('progress')[0] + 964:
-                    canvas.itemconfig(progress, text="Unpacking...")
+                def git_connect():
+                    try:
+                        git.Repo.clone_from("https://github.com/SirHalvard/Champions-Ashes",
+                                            moddir + "/Ashes", progress=CloneProgress(), depth=1)
+                        canvas.itemconfig(progress, text="")
+                        canvas.itemconfig('progress', state='hidden')
+                        canvas.itemconfig('proglines', state='hidden')
+                        launch()
+                    except Exception:
+                        state = messagebox.askretrycancel('AshesLauncher', "There was an error installing. Retry?")
+                        if state is True:
+                            git_connect()
+                        else:
+                            messagebox.showerror('AshesLauncher', "Error for troubleshooting:\n" + traceback.format_exc())
+                git_connect()
+                installing = 0
+                canvas.itemconfig(play_button, state='normal')
 
-        def install():
-            canvas.itemconfig(play_button, state='disabled')
-            global installing
+            def update():
+                canvas.itemconfig(play_button, state='disabled')
+                for files in os.listdir(moddir + "/Ashes/.git"):
+                    if files.endswith('lock'):
+                        os.remove(moddir + "/Ashes/.git/" + files)
 
-            def git_connect():
-                try:
-                    git.Repo.clone_from("https://github.com/SirHalvard/Champions-Ashes",
-                                        moddir + "/Ashes", progress=CloneProgress(), depth=1)
-                    canvas.itemconfig(progress, text="")
-                    canvas.itemconfig('progress', state='hidden')
-                    canvas.itemconfig('proglines', state='hidden')
-                    launch()
-                except Exception:
-                    state = messagebox.askretrycancel('AshesLauncher', "There was an error installing. Retry?")
-                    if state is True:
-                        git_connect()
-                    else:
-                        messagebox.showerror('AshesLauncher', "Error for troubleshooting:\n" + traceback.format_exc())
+                global installing
+                repo = git.Repo(moddir + "/Ashes")
 
-            git_connect()
-            installing = 0
-            canvas.itemconfig(play_button, state='normal')
+                def git_connect():
+                    try:
+                        repo = git.Repo(moddir + "/Ashes")
+                        repo.git.fetch('--depth=1')
+                        repo.git.merge('-X', 'theirs', '--allow-unrelated-histories', '--no-commit', 'origin/master')
+                        canvas.itemconfig(progress, text="")
+                        canvas.itemconfig('progress', state='hidden')
+                        canvas.itemconfig('proglines', state='hidden')
+                    except Exception:
+                        state = messagebox.askretrycancel('AshesLauncher', "There was an error updating. Retry?")
+                        if state is True:
+                            git_connect()
+                        else:
+                            messagebox.showerror('AshesLauncher', "Error for troubleshooting:\n" + traceback.format_exc())
 
-        def update():
-            canvas.itemconfig(play_button, state='disabled')
-            for files in os.listdir(moddir + "/Ashes/.git"):
-                if files.endswith('lock'):
-                    os.remove(moddir + "/Ashes/.git/" + files)
+                git_connect()
+                launch()
+                installing = 0
+                canvas.itemconfig(play_button, state='normal')
 
-            global installing
-            repo = git.Repo(moddir + "/Ashes")
+            def reset():
+                repo = git.Repo(moddir + "/Ashes")
+                repo.git.reset('--hard', 'origin/master')
 
-            def git_connect():
-                try:
-                    repo.git.fetch('--depth=1')
-                    repo.git.merge('-X', 'theirs', '--allow-unrelated-histories', '--no-commit', 'origin/master')
-                    canvas.itemconfig(progress, text="")
-                    canvas.itemconfig('progress', state='hidden')
-                    canvas.itemconfig('proglines', state='hidden')
-                    launch()
-                except Exception:
-                    state = messagebox.askretrycancel('AshesLauncher', "There was an error updating. Retry?")
-                    if state is True:
-                        git_connect()
-                    else:
-                        messagebox.showerror('AshesLauncher', "Error for troubleshooting:\n" + traceback.format_exc())
-
-            git_connect()
-            installing = 0
-            canvas.itemconfig(play_button, state='normal')
-
-        def reset():
-            repo = git.Repo(moddir + "/Ashes")
-            repo.git.reset('--hard', 'origin/master')
-
-        def clean():
-            repo = git.Repo(moddir + "/Ashes")
-            repo.git.clean('-xdf')
-
+            def clean():
+                repo = git.Repo(moddir + "/Ashes")
+                repo.git.clean('-xdf')
+        else:
+            def reset():
+                messagebox.showinfo("AshesLauncher", "Git is disabled.")
+            def clean():
+                messagebox.showinfo("AshesLauncher", "Git is disabled.")
         def migrate():
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
@@ -380,16 +374,18 @@ try:
                 mod_panel.place(x=50, y=150)
 
         def ashes():
-            if os.path.isdir(moddir + "/Ashes/.git") is False:
-                Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
-                s = threading.Thread(target=install)
-                s.setDaemon(True)
-                s.start()
+            if git_enabled == 1:
+                if os.path.isdir(moddir + "/Ashes/.git") is False:
+                    Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
+                    s = threading.Thread(target=install)
+                    s.setDaemon(True)
+                    s.start()
+                else:
+                    s = threading.Thread(target=update)
+                    s.setDaemon(True)
+                    s.start()
             else:
-                s = threading.Thread(target=update)
-                s.setDaemon(True)
-                s.start()
-
+                launch()
         def delete():
             if os.path.isfile(dir_path + "/dinput8.dll"):
                 os.remove(dir_path + "/dinput8.dll")
@@ -399,7 +395,6 @@ try:
                 os.remove(dir_path + "/lazyLoad.ini")
 
         def browse():
-            settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w+")
             global dir_path
             dir_path = filedialog.askdirectory()
 
