@@ -229,27 +229,27 @@ try:
                     config = configparser.ConfigParser()
                     config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
                     config.set('files', 'modOverrideDirectory',
-                                   f'"/{moddir}/Ashes/_ashes"'.replace(f'{dir_path}/', ''))
+                               f'"/{moddir}/Ashes/_ashes"'.replace(f'{dir_path}/', ''))
                     with open(dir_path + '/modengine.ini', 'w+') as file:
                         config.write(file)
                     print(os.path.isdir(f'{moddir}/{mod_name.get()}/{modfiles}'))
                 elif os.path.isfile(moddir + '/' + mod_name.get() + '/modengine.ini ') is True:
                     for modfiles in os.listdir(moddir + '/' + mod_name.get()):
                         if os.path.isdir(f'{moddir}/{mod_name.get()}/{modfiles}'):
-                                config = configparser.ConfigParser()
-                                config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
-                                config.set('files', 'modOverrideDirectory',
-                                           f'"/{moddir}/{mod_name.get()}/{modfiles}"'.replace(f'{dir_path}/', ''))
-                                with open(dir_path + '/modengine.ini', 'w+') as file:
-                                    config.write(file)
+                            config = configparser.ConfigParser()
+                            config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
+                            config.set('files', 'modOverrideDirectory',
+                                       f'"/{moddir}/{mod_name.get()}/{modfiles}"'.replace(f'{dir_path}/', ''))
+                            with open(dir_path + '/modengine.ini', 'w+') as file:
+                                config.write(file)
 
-                    shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
-                    config = configparser.ConfigParser()
-                    config.read(os.path.abspath(f'{dir_path}/lazyLoad.ini'))
-                    config.set('LAZYLOAD', 'dllModFolderName',
-                               f'{moddir}/{mod_name.get()}'.replace(f'{dir_path}/', ''))
-                    with open(dir_path + '/lazyLoad.ini', 'w+') as file:
-                        config.write(file)
+                shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
+                config = configparser.ConfigParser()
+                config.read(os.path.abspath(f'{dir_path}/lazyLoad.ini'))
+                config.set('LAZYLOAD', 'dllModFolderName',
+                           f'{moddir}/{mod_name.get()}'.replace(f'{dir_path}/', ''))
+                with open(dir_path + '/lazyLoad.ini', 'w+') as file:
+                    config.write(file)
             else:
                 if os.path.islink(dir_path + '/mods') is True:
                     os.unlink(dir_path + '/mods')
@@ -267,20 +267,20 @@ try:
                     config = configparser.ConfigParser()
                     config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
                     config.set('files', 'modOverrideDirectory',
-                                   '"/mods/_ashes"')
+                               '"/mods/_ashes"')
                     with open(dir_path + '/modengine.ini', 'w+') as file:
                         config.write(file)
                 elif os.path.isfile(moddir + '/' + mod_name.get() + '/modengine.ini ') is True:
                     for modfiles in os.listdir(moddir + '/' + mod_name.get()):
                         if os.path.isdir(f'{moddir}/{mod_name.get()}/{modfiles}'):
-                                config = configparser.ConfigParser()
-                                config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
-                                config.set('files', 'modOverrideDirectory',
-                                           f'"/mods/{modfiles}"')
-                                with open(dir_path + '/modengine.ini', 'w+') as file:
-                                    config.write(file)
+                            config = configparser.ConfigParser()
+                            config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
+                            config.set('files', 'modOverrideDirectory',
+                                       f'"/mods/{modfiles}"')
+                            with open(dir_path + '/modengine.ini', 'w+') as file:
+                                config.write(file)
 
-            shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
+                shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
             shutil.copy("files/lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
             webbrowser.open('steam://rungameid/374320')
 
@@ -402,8 +402,20 @@ try:
             settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w+")
             global dir_path
             dir_path = filedialog.askdirectory()
-            settings_file.write(dir_path)
-            settings_file.close()
+
+            def check():
+                global dir_path
+                if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
+                    if messagebox.askyesno("AshesLauncher", "Please select Game folder.") is True:
+                        settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w+")
+                        dir_path = filedialog.askdirectory()
+                        if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
+                            check()
+                        else:
+                            settings_file.write(dir_path)
+                            settings_file.close()
+
+            check()
             if len(dir_path) >= 83:
                 game_path.set("..." + dir_path[-80:])
             else:
@@ -414,9 +426,9 @@ try:
             global moddir
             moddir = filedialog.askdirectory()
             if os.path.isdir(moddir) is False:
-                moddir = os.path.abspath('.')
+                moddir = dir_path + '/AshesLauncher'
             if moddir == '/':
-                moddir = os.path.abspath('.')
+                moddir = dir_path + '/AshesLauncher'
             if os.path.isfile(moddir + 'DarkSoulsIII.exe') is True:
                 moddir = moddir + 'AshesLauncher'
             moddir_file.write(moddir)
