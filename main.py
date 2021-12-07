@@ -39,7 +39,6 @@ try:
     Path to resources used.
     """
 
-
     def resource_path(relative_path):
         """ Get absolute path to resource, works for dev and for PyInstaller """
         try:
@@ -335,12 +334,12 @@ try:
 
             def git_connect():
                 try:
+                    repo = git.Repo(moddir + "/Ashes")
                     repo.git.fetch('--depth=1')
                     repo.git.merge('-X', 'theirs', '--allow-unrelated-histories', '--no-commit', 'origin/master')
                     canvas.itemconfig(progress, text="")
                     canvas.itemconfig('progress', state='hidden')
                     canvas.itemconfig('proglines', state='hidden')
-                    launch()
                 except Exception:
                     state = messagebox.askretrycancel('AshesLauncher', "There was an error updating. Retry?")
                     if state is True:
@@ -349,6 +348,7 @@ try:
                         messagebox.showerror('AshesLauncher', "Error for troubleshooting:\n" + traceback.format_exc())
 
             git_connect()
+            launch()
             installing = 0
             canvas.itemconfig(play_button, state='normal')
 
