@@ -28,6 +28,8 @@ Discord: 	    https://discord.gg/xEMdvaTVc3
 ## Credits
 The Champion's Ashes team  (Champion's Ashes)   
 Church Guard (Lazy Loader: https://www.nexusmods.com/darksouls3/mods/677)  
+
+Featuring background images from:  
 Nobody#6945  
 ultimate life form#8606  
 Great Mighty p0#0001  
