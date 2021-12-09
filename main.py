@@ -31,6 +31,7 @@ try:
     if os.path.isfile(os.path.abspath('.') + "/files/Git/cmd/git.exe") is True:
         os.environ['GIT_PYTHON_GIT_EXECUTABLE'] = os.path.abspath('.') + "/files/Git/cmd/git.exe"
         import git
+
         git_enabled = 1
     else:
         git_enabled = 0
@@ -185,7 +186,7 @@ try:
         title_icon = tkinter.PhotoImage(file=resource_path('icon.png'))
         root.iconphoto(True, title_icon)
         root.wm_title("AshesLauncher")
-        root.geometry(f'1280x720+{int(root.winfo_screenwidth()/2 - 540)}+{int(root.winfo_screenheight()/2 - 360)}')
+        root.geometry(f'1280x720+{int(root.winfo_screenwidth() / 2 - 540)}+{int(root.winfo_screenheight() / 2 - 360)}')
 
         def play_vanilla(event):
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
@@ -294,6 +295,8 @@ try:
             def install():
                 canvas.itemconfig(play_button, state='disabled')
                 global installing
+                ashes_panel_button1.config(state='disabled')
+                ashes_panel_button2.config(state='disabled')
 
                 def git_connect():
                     try:
@@ -308,16 +311,19 @@ try:
                         if state is True:
                             git_connect()
                         else:
-                            messagebox.showerror('AshesLauncher', "Error for troubleshooting:\n" + traceback.format_exc())
+                            messagebox.showerror('AshesLauncher',
+                                                 "Error for troubleshooting:\n" + traceback.format_exc())
+
                 git_connect()
                 installing = 0
                 canvas.itemconfig(play_button, state='normal')
+                ashes_panel_button1.config(state='normal')
+                ashes_panel_button2.config(state='normal')
 
             def update():
                 canvas.itemconfig(play_button, state='disabled')
-                for files in os.listdir(moddir + "/Ashes/.git"):
-                    if files.endswith('lock'):
-                        os.remove(moddir + "/Ashes/.git/" + files)
+                ashes_panel_button1.config(state='disabled')
+                ashes_panel_button2.config(state='disabled')
 
                 global installing
                 repo = git.Repo(moddir + "/Ashes")
@@ -335,25 +341,36 @@ try:
                         if state is True:
                             git_connect()
                         else:
-                            messagebox.showerror('AshesLauncher', "Error for troubleshooting:\n" + traceback.format_exc())
+                            messagebox.showerror('AshesLauncher',
+                                                 "Error for troubleshooting:\n" + traceback.format_exc())
 
                 git_connect()
                 launch()
                 installing = 0
                 canvas.itemconfig(play_button, state='normal')
+                ashes_panel_button1.config(state='normal')
+                ashes_panel_button2.config(state='normal')
 
             def reset():
+                for files in os.listdir(moddir + "/Ashes/.git"):
+                    if files.endswith('.lock'):
+                        os.remove(moddir + "/Ashes/.git/" + files)
                 repo = git.Repo(moddir + "/Ashes")
                 repo.git.reset('--hard', 'origin/master')
 
             def clean():
+                for files in os.listdir(moddir + "/Ashes/.git"):
+                    if files.endswith('.lock'):
+                        os.remove(moddir + "/Ashes/.git/" + files)
                 repo = git.Repo(moddir + "/Ashes")
                 repo.git.clean('-xdf')
         else:
             def reset():
                 messagebox.showinfo("AshesLauncher", "Git is disabled.")
+
             def clean():
                 messagebox.showinfo("AshesLauncher", "Git is disabled.")
+
         def migrate():
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
@@ -375,6 +392,9 @@ try:
 
         def ashes():
             if git_enabled == 1:
+                for files in os.listdir(moddir + "/Ashes/.git"):
+                    if files.endswith('.lock'):
+                        os.remove(moddir + "/Ashes/.git/" + files)
                 if os.path.isdir(moddir + "/Ashes/.git") is False:
                     Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
                     s = threading.Thread(target=install)
@@ -386,6 +406,7 @@ try:
                     s.start()
             else:
                 launch()
+
         def delete():
             if os.path.isfile(dir_path + "/dinput8.dll"):
                 os.remove(dir_path + "/dinput8.dll")
@@ -640,7 +661,12 @@ try:
 
         if os.path.isfile(moddir + "/Ashes/_version.txt"):
             version = open(moddir + "/Ashes/_version.txt", 'r').read()
-            canvas.create_text(20, 680, text="Installed: Version " + version, font=("Friz Quadrata Std", 14),
+            canvas.create_text(10, 690, text=f"Installed Version {version}/Launcher Version 1.2.3.2",
+                               font=("Friz Quadrata Std", 14),
+                               fill="white", anchor=tkinter.NW, tags='home')
+        else:
+            canvas.create_text(10, 690, text="Launcher Version 1.2.3.2",
+                               font=("Friz Quadrata Std", 14),
                                fill="white", anchor=tkinter.NW, tags='home')
 
         canvas.create_image(650, 135, image=discord, tags=('discord', 'home'), anchor=tkinter.NW)
