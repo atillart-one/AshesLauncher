@@ -3,6 +3,7 @@ import ctypes
 import sys
 
 try:
+    import winreg
     import atexit
     import os
     import os.path
@@ -181,6 +182,9 @@ try:
         root.destroy()
 
 
+    mod_list = []
+    user_list = []
+
     def main():
         root = tkinter.Tk()
         title_icon = tkinter.PhotoImage(file=resource_path('icon.png'))
@@ -195,23 +199,15 @@ try:
             else:
                 vanilla()
 
-        def play_ashes(event):
+        def play_mod(event):
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
                 browse()
             elif mod_name.get() == "Ashes":
-                Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
                 ashes()
             else:
-                Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
-                play_mod()
-
-        def play_mod():
-            if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
-                messagebox.showinfo("AshesLauncher", "Please select Game folder.")
-                browse()
-            else:
                 launch()
+
 
         def vanilla():
             delete()
@@ -385,10 +381,15 @@ try:
                     mod_path.set("..." + moddir[-80:])
                 else:
                     mod_path.set(moddir)
-                Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
-                mod_panel.destroy()
+                global mod_list
+                for radio in mod_list:
+                    radio.destroy()
+                mod_list = []
                 mod_creation()
-                mod_panel.place(x=50, y=150)
+                count = 0
+                for radio in mod_list:
+                    radio.place(x=50, y=150 + count * 45)
+                    count += 1
 
         def ashes():
             if git_enabled == 1:
@@ -421,16 +422,18 @@ try:
 
             def check():
                 global dir_path
+                settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w+")
                 if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                     if messagebox.askyesno("AshesLauncher", "Please select Game folder.") is True:
-                        settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w+")
                         dir_path = filedialog.askdirectory()
                         if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                             check()
                         else:
                             settings_file.write(dir_path)
                             settings_file.close()
-
+                else:
+                    settings_file.write(dir_path)
+                    settings_file.close()
             check()
             if len(dir_path) >= 83:
                 game_path.set("..." + dir_path[-80:])
@@ -453,10 +456,15 @@ try:
                 mod_path.set("..." + moddir[-80:])
             else:
                 mod_path.set(moddir)
-            Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
-            mod_panel.destroy()
+            global mod_list
+            for radio in mod_list:
+                radio.destroy()
+            mod_list = []
             mod_creation()
-            mod_panel.place(x=50, y=150)
+            count = 0
+            for radio in mod_list:
+                radio.place(x=50, y=150 + count * 45)
+                count += 1
 
         """Lets user drag the window to reposition."""
 
@@ -489,7 +497,7 @@ try:
             canvas.tag_bind(mod_button, "<ButtonPress-1>", mod_disabled)
             canvas.tag_bind(mod_button, "<Enter>", lambda event: canvas.itemconfig(mod_button, image=enabled_select))
             canvas.tag_bind(mod_button, "<Leave>", lambda event: canvas.itemconfig(mod_button, image=enabled))
-            canvas.tag_bind(play_button, "<ButtonPress-1>", play_ashes)
+            canvas.tag_bind(play_button, "<ButtonPress-1>", play_mod)
 
         def preset_vanilla(event):
             if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable VANILLA.cmd") is False:
@@ -510,13 +518,11 @@ try:
                 os.startfile(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable FIDELITY.cmd"))
 
         """ Swap Tabs"""
-
         def tab_select(i, event):
             if i == 'home':
                 canvas.itemconfig('home', state='normal')
                 canvas.itemconfig('graphics', state='hidden')
                 canvas.itemconfig('mods', state='hidden')
-                canvas.itemconfig('accs', state='hidden')
                 canvas_patch.place(x=50, y=250)
                 if installing == 1:
                     canvas.itemconfig('proglines', state='normal')
@@ -526,7 +532,10 @@ try:
                     canvas.itemconfig('proglines', state='hidden')
                     canvas.itemconfig('progress', state='hidden')
                     canvas.itemconfig(progress, state='hidden')
-                mod_panel.place_forget()
+                for radio in mod_list:
+                    radio.place_forget()
+                for radio in user_list:
+                    radio.place_forget()
                 path_panel1.place_forget()
                 path_panel2.place_forget()
                 ashes_panel_button1.place_forget()
@@ -536,9 +545,11 @@ try:
                 canvas.itemconfig('home', state='hidden')
                 canvas.itemconfig('graphics', state='normal')
                 canvas.itemconfig('mods', state='hidden')
-                canvas.itemconfig('accs', state='hidden')
                 canvas_patch.place_forget()
-                mod_panel.place_forget()
+                for radio in mod_list:
+                    radio.place_forget()
+                for radio in user_list:
+                    radio.place_forget()
                 path_panel1.place_forget()
                 path_panel2.place_forget()
                 ashes_panel_button1.place_forget()
@@ -548,27 +559,20 @@ try:
                 canvas.itemconfig('home', state='hidden')
                 canvas.itemconfig('graphics', state='hidden')
                 canvas.itemconfig('mods', state='normal')
-                canvas.itemconfig('accs', state='hidden')
                 canvas_patch.place_forget()
-                mod_panel.place(x=50, y=150)
-                path_panel1.place(x=50, y=585)
-                path_panel2.place(x=50, y=640)
-                ashes_panel_button1.place(x=610, y=150)
-                ashes_panel_button2.place(x=610, y=200)
-                ashes_panel_button3.place(x=610, y=250)
-            if i == 'accs':
-                canvas.itemconfig('home', state='hidden')
-                canvas.itemconfig('graphics', state='hidden')
-                canvas.itemconfig('mods', state='hidden')
-                canvas.itemconfig('accs', state='normal')
-                canvas_patch.place_forget()
-                mod_panel.place_forget()
-                path_panel1.place_forget()
-                path_panel2.place_forget()
-                ashes_panel_button3.place_forget()
-                ashes_panel_button1.place_forget()
-                ashes_panel_button2.place_forget()
-
+                count = 0
+                for radio in mod_list:
+                    radio.place(x=50, y=150 + count*45)
+                    count += 1
+                count = 0
+                for radio in user_list:
+                    radio.place(x=680, y=370 + count*45)
+                    count +=1
+                path_panel1.place(x=50, y=605)
+                path_panel2.place(x=50, y=660)
+                ashes_panel_button1.place(x=680, y=150)
+                ashes_panel_button2.place(x=680, y=195)
+                ashes_panel_button3.place(x=680, y=240)
         canvas = tkinter.Canvas(width=1280, height=720, bg='black', highlightthickness=0)
         canvas.pack(expand=tkinter.YES, fill=tkinter.BOTH)
 
@@ -598,6 +602,8 @@ try:
         mods_img = tkinter.PhotoImage(file=resource_path('mods.png'))
         paths_img = tkinter.PhotoImage(file=resource_path('paths.png'))
         ashes_img = tkinter.PhotoImage(file=resource_path('ashes.png'))
+        accs_img = tkinter.PhotoImage(file=resource_path('accounts.png'))
+        logo = tkinter.PhotoImage(file=resource_path('logo.png'))
 
         """BACKGROUND"""
         bg = tkinter.PhotoImage(file=resource_path('bg.png'))
@@ -643,8 +649,6 @@ try:
                                              activefill="#e4dfd4", anchor=tkinter.NW)
         mods_button = canvas.create_text(390, 18, text='MODS', font=("Friz Quadrata Std", 16), fill='#ecd9ad',
                                          activefill="#e4dfd4", anchor=tkinter.NW, state='normal')
-        accounts_button = canvas.create_text(530, 18, text='ACCOUNTS', font=("Friz Quadrata Std", 16), fill='#ecd9ad',
-                                             activefill="#e4dfd4", anchor=tkinter.NW, state='hidden')
         cross = canvas.create_image(1220, 18, image=cross_pic, anchor=tkinter.NW)
 
         """HOME"""
@@ -661,21 +665,23 @@ try:
 
         if os.path.isfile(moddir + "/Ashes/_version.txt"):
             version = open(moddir + "/Ashes/_version.txt", 'r').read()
-            canvas.create_text(10, 690, text=f"Installed Version {version}/Launcher Version 1.2.3.2",
+            canvas.create_text(10, 690, text=f"Installed Version {version}/Launcher Version 1.3",
                                font=("Friz Quadrata Std", 14),
                                fill="white", anchor=tkinter.NW, tags='home')
         else:
-            canvas.create_text(10, 690, text="Launcher Version 1.2.3.2",
+            canvas.create_text(10, 690, text="Launcher Version 1.3",
                                font=("Friz Quadrata Std", 14),
                                fill="white", anchor=tkinter.NW, tags='home')
 
-        canvas.create_image(650, 135, image=discord, tags=('discord', 'home'), anchor=tkinter.NW)
-        canvas.create_image(650, 205, image=wiki, tags=('wiki', 'home'), anchor=tkinter.NW)
-        canvas.create_image(650, 275, image=changelog, tags=('changelog', 'home'), anchor=tkinter.NW)
+        canvas.create_image(730, 355, image=discord, tags=('discord', 'home'), anchor=tkinter.NW)
+        canvas.create_image(880, 355, image=wiki, tags=('wiki', 'home'), anchor=tkinter.NW)
+        canvas.create_image(1030, 355, image=changelog, tags=('changelog', 'home'), anchor=tkinter.NW)
 
-        discord_panel = canvas.create_image(650, 135, image=discord, tags='home', anchor=tkinter.NW)
-        wiki_panel = canvas.create_image(650, 205, image=wiki, tags='home', anchor=tkinter.NW)
-        changelog_panel = canvas.create_image(650, 275, image=changelog, tags='home', anchor=tkinter.NW)
+        discord_panel = canvas.create_image(730, 355, image=discord, tags='home', anchor=tkinter.NW)
+        wiki_panel = canvas.create_image(880, 355, image=wiki, tags='home', anchor=tkinter.NW)
+        changelog_panel = canvas.create_image(1030, 355, image=changelog, tags='home', anchor=tkinter.NW)
+
+        canvas.create_image(650, 220, image=logo, tags='home', anchor=tkinter.NW)
 
         """Display Patch Notes"""
         canvas.create_image(-3, 135, image=patch, anchor=tkinter.NW, tags='home')
@@ -763,30 +769,29 @@ try:
             lastmod_file.close()
 
         def mod_creation():
-            global mod_panel
-            mod_panel = tkinter.LabelFrame(root, bg='#141414', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
-                                           font=('Friz Quadrata Std', 24))
             for mod in os.listdir(moddir):
                 if os.path.isdir(moddir + "/" + mod):
                     if mod == "Ashes":
-                        radio = tkinter.Radiobutton(mod_panel, indicatoron=0, text="Champion's Ashes",
+                        radio = tkinter.Radiobutton(root, indicatoron=0, text="Champion's Ashes",
                                                     variable=mod_name, value=mod,
-                                                    width=40, bg='#141414', fg='#e4dfd4', selectcolor='#273355',
-                                                    borderwidth=1, activeforeground='#0f0f0f',
+                                                    width=45, bg='#141414', fg='#e4dfd4', selectcolor='#273355',
+                                                    bd=1, activeforeground='#0f0f0f',
                                                     activebackground='#e4dfd4',
                                                     command=modchosen, font=("FOT-Matisse Pro M", 14),
-                                                    relief=tkinter.SOLID)
+                                                    relief=tkinter.GROOVE, offrelief=tkinter.GROOVE,
+                                                    overrelief=tkinter.RIDGE)
 
-                        radio.grid()
+                        mod_list.append(radio)
                     else:
-                        radio = tkinter.Radiobutton(mod_panel, indicatoron=0, text=mod, variable=mod_name, value=mod,
-                                                    width=40, bg='#141414', fg='#e4dfd4', selectcolor='#273355',
-                                                    borderwidth=1, activeforeground='#0f0f0f',
+                        radio = tkinter.Radiobutton(root, indicatoron=0, text=mod, variable=mod_name, value=mod,
+                                                    width=45, bg='#141414', fg='#e4dfd4', selectcolor='#273355',
+                                                    bd=1, activeforeground='#0f0f0f',
                                                     activebackground='#e4dfd4',
                                                     command=modchosen, font=("FOT-Matisse Pro M", 14),
-                                                    relief=tkinter.SOLID)
+                                                    relief=tkinter.GROOVE, offrelief=tkinter.GROOVE,
+                                                    overrelief=tkinter.RIDGE)
 
-                        radio.grid()
+                        mod_list.append(radio)
 
         mod_creation()
         game_path = tkinter.StringVar(root)
@@ -800,7 +805,7 @@ try:
         else:
             mod_path.set(moddir)
 
-        canvas.create_image(50, 535, image=paths_img, anchor=tkinter.NW, state='hidden', tags='mods')
+        canvas.create_image(50, 555, image=paths_img, anchor=tkinter.NW, state='hidden', tags='mods')
         path_panel1 = tkinter.LabelFrame(root, bg='#141414', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
                                          font=('Friz Quadrata Std', 24))
         path_panel2 = tkinter.LabelFrame(root, bg='#141414', fg='#f0deb4', relief=tkinter.GROOVE, bd=1,
@@ -820,22 +825,52 @@ try:
                        fg='#f0deb4', command=browse_mod, relief=tkinter.FLAT,
                        activeforeground='#0f0f0f',
                        activebackground='#e4dfd4').grid(column=2, row=0, padx=10)
-        canvas.create_image(610, 100, image=ashes_img, state='hidden', anchor=tkinter.NW, tags='mods')
+        canvas.create_image(680, 100, image=ashes_img, state='hidden', anchor=tkinter.NW, tags='mods')
 
-        ashes_panel_button1 = tkinter.Button(root, text='Restore All Files', bd=1, font=("FOT-Matisse Pro M", 14),
+        ashes_panel_button1 = tkinter.Button(root, text='Reset All Files', bd=1, font=("FOT-Matisse Pro M", 14),
                                              bg='#141414', fg='#e4dfd4', command=reset, relief=tkinter.GROOVE,
-                                             activeforeground='#0f0f0f',
-                                             activebackground='#e4dfd4', width=50)
+                                             activeforeground='#0f0f0f', overrelief=tkinter.RIDGE,
+                                             activebackground='#e4dfd4', width=45, pady=0)
         ashes_panel_button2 = tkinter.Button(root, text='Remove Extra Files', bd=1, font=("FOT-Matisse Pro M", 14),
-                                             bg='#141414',
-                                             fg='#e4dfd4', command=clean, relief=tkinter.GROOVE,
-                                             activeforeground='#0f0f0f', activebackground='#e4dfd4', width=50)
+                                             bg='#141414', overrelief=tkinter.RIDGE,
+                                             fg='#e4dfd4', command=clean, relief=tkinter.GROOVE, pady=0,
+                                             activeforeground='#0f0f0f', activebackground='#e4dfd4', width=45)
         ashes_panel_button3 = tkinter.Button(root, text='Use Default Mod Location', bd=1,
                                              font=("FOT-Matisse Pro M", 14),
-                                             bg='#141414',
+                                             bg='#141414', overrelief=tkinter.RIDGE,
                                              fg='#e4dfd4', command=migrate, relief=tkinter.GROOVE,
-                                             activeforeground='#0f0f0f',
-                                             activebackground='#e4dfd4', width=50)
+                                             activeforeground='#0f0f0f', pady=0,
+                                             activebackground='#e4dfd4', width=45)
+
+        def switch_account():
+            os.system("taskkill /f /im steam.exe")
+            registry_steam = winreg.CreateKey(winreg.HKEY_CURRENT_USER, "Software\Valve\Steam")
+            winreg.SetValueEx(registry_steam, 'AutoLoginUser', 0, winreg.REG_SZ, current_username.get())
+            winreg.SetValueEx(registry_steam, 'RememberPassword', 0, winreg.REG_DWORD, 1)
+            os.system("start steam:")
+            winreg.CloseKey(registry_steam)
+
+        if os.path.isfile(os.path.abspath('./accounts.ini')):
+            config = configparser.ConfigParser()
+            config.read(os.path.abspath('./accounts.ini'))
+            if config['enable']['enable'] == 'True':
+                canvas.create_image(680, 320, image=accs_img, state='hidden', anchor=tkinter.NW, tags='mods')
+                registry_steam = winreg.CreateKey(winreg.HKEY_CURRENT_USER, "Software\Valve\Steam")
+                current_username = tkinter.StringVar(root, winreg.QueryValueEx(registry_steam, 'AutoLoginUser')[0])
+                winreg.CloseKey(registry_steam)
+                config = configparser.ConfigParser()
+                config.read(os.path.abspath('./accounts.ini'))
+                for username in config['usernames']:
+                    radio = tkinter.Radiobutton(root, indicatoron=0, text=config['usernames'][username],
+                                                variable=current_username, value=username,
+                                                width=45, bg='#141414', fg='#e4dfd4', selectcolor='#273355',
+                                                bd=1, activeforeground='#0f0f0f',
+                                                activebackground='#e4dfd4',
+                                                command=switch_account, font=("FOT-Matisse Pro M", 14),
+                                                relief=tkinter.GROOVE, offrelief=tkinter.GROOVE,
+                                                overrelief=tkinter.RIDGE)
+
+                    user_list.append(radio)
 
         """BINDS"""
         canvas.tag_bind(cross, '<ButtonPress-1>', onObjectClick)
@@ -850,7 +885,6 @@ try:
         canvas.tag_bind(mod_button, "<Leave>", lambda event: canvas.itemconfig(mod_button, image=disabled))
         canvas.tag_bind(home_button, '<ButtonPress-1>', lambda event: tab_select('home', event))
         canvas.tag_bind(graphics_button, '<ButtonPress-1>', lambda event: tab_select('graphics', event))
-        canvas.tag_bind(accounts_button, '<ButtonPress-1>', lambda event: tab_select('accs', event))
         canvas.tag_bind(mods_button, '<ButtonPress-1>', lambda event: tab_select('mods', event))
         canvas.tag_bind(vanilla_panel, "<Enter>", lambda event: canvas.itemconfig('vanilla', image=graph_select))
         canvas.tag_bind(vanilla_panel, "<Leave>", lambda event: canvas.itemconfig('vanilla', image=graph))

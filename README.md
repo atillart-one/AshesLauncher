@@ -15,6 +15,10 @@ Convergence example:
 ![image](https://github.com/Atillart-One/AshesLauncher/blob/main/scrn.png)  
 These files are all present in a folder named "The Convergence" (can be named anything) inside the mods folder.
 
+## Switching Accounts
+To switch accounts, open the accompanying accounts.ini in your launcher folder and change enabled = False to enabled = True.
+Then under usernames, follow the instructions to add your accounts.
+
 ## Additional Notes
 The Champion's Ashes mod WILL ban you if you have it enabled and launch the game. Make sure it's disabled before using an account that you don't want banned.  
 If you need to disable installing/updating Champion's Ashes, simply delete the Git folder in the files folder present in the launcher folder.  
