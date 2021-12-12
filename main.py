@@ -697,7 +697,7 @@ try:
             patchnotes_text = canvas_patch.create_text(0, 10, text=patchnotes.replace('\r', ''), fill='#e4dfd4',
                                                        width=525,
                                                        font=("Friz Quadrata Std", 12), anchor=tkinter.NW)
-        except (requests.ConnectionError, requests.Timeout):
+        except Exception:
             patchnotes_text = canvas_patch.create_text(0, 10, text='Failed to get patch notes.'
                                                                    ' You may be disconnected from the internet.',
                                                        fill='#e4dfd4', width=525, font=("Friz Quadrata Std", 12),
