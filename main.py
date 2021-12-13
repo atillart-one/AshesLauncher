@@ -393,15 +393,15 @@ try:
 
         def ashes():
             if git_enabled == 1:
-                for files in os.listdir(moddir + "/Ashes/.git"):
-                    if files.endswith('.lock'):
-                        os.remove(moddir + "/Ashes/.git/" + files)
                 if os.path.isdir(moddir + "/Ashes/.git") is False:
                     Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
                     s = threading.Thread(target=install)
                     s.setDaemon(True)
                     s.start()
                 else:
+                    for files in os.listdir(moddir + "/Ashes/.git"):
+                        if files.endswith('.lock'):
+                            os.remove(moddir + "/Ashes/.git/" + files)
                     s = threading.Thread(target=update)
                     s.setDaemon(True)
                     s.start()

@@ -6,7 +6,7 @@ A launcher for the Dark Souls III mod Champion's Ashes, made by atillart#4807.
 To use, simply extract into a folder and run AshesLauncher4.exe.  
 If you have an older non-launcher manual install, delete the Ashes folder inside the AshesLauncher folder from your Game folder, or select another mod directory.   
 If you recieve any error while trying to launch the mod from a manual install, try pressing "Reset All Files" present under the MODS tab first.  
-The launcher temporarily freezing is completely normal after pressing it.
+The launcher temporarily freezing after pressing it is completely normal.
 
 ## Using Other Mods
 To utilize other mods when not playing Champion's Ashes, simply put the mods in their own folders inside the AshesLauncher folder (can be changed by selecting mods path in MODS tab.)    
