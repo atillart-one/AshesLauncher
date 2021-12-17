@@ -364,6 +364,41 @@ try:
                 b1.config(state='normal')
                 b2.config(state='normal')
 
+            def update_dev():
+                canvas.itemconfig(play_button, state='disabled')
+                ashes_panel_button1.config(state='disabled')
+                ashes_panel_button2.config(state='disabled')
+                ashes_panel_button3.config(state='disabled')
+                b1.config(state='disabled')
+                b2.config(state='disabled')
+
+                global installing
+
+                def git_connect():
+                    try:
+                        repo = git.Repo(moddir + "/Champions-Ashes-Dev")
+                        repo.git.pull()
+                        canvas.itemconfig(progress, text="")
+                        canvas.itemconfig('progress', state='hidden')
+                        canvas.itemconfig('proglines', state='hidden')
+                    except Exception:
+                        state = messagebox.askretrycancel('AshesLauncher', "There was an error updating. Retry?")
+                        if state is True:
+                            git_connect()
+                        elif messagebox.askyesno('AshesLauncher', "Launch Game anyways?") is not True:
+                            messagebox.showerror('AshesLauncher',
+                                                 "Error for troubleshooting:\n" + traceback.format_exc())
+
+                git_connect()
+                launch()
+                installing = 0
+                canvas.itemconfig(play_button, state='normal')
+                ashes_panel_button1.config(state='normal')
+                ashes_panel_button2.config(state='normal')
+                ashes_panel_button3.config(state='normal')
+                b1.config(state='normal')
+                b2.config(state='normal')
+
             def reset():
                 for files in os.listdir(moddir + "/Ashes/.git"):
                     if files.endswith('.lock'):
@@ -430,7 +465,7 @@ try:
                 for files in os.listdir(moddir + "/Champions-Ashes-Dev/.git"):
                     if files.endswith('.lock'):
                         os.remove(moddir + "/Champions-Ashes-Dev/.git/" + files)
-                s = threading.Thread(target=update)
+                s = threading.Thread(target=update_dev)
                 s.setDaemon(True)
                 s.start()
             else:
