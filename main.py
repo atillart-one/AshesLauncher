@@ -17,6 +17,7 @@ try:
     import threading
     import requests
     import configparser
+    import subprocess
 
 except Exception:
     ctypes.windll.user32.MessageBoxW(0, traceback.format_exc(), "Error", 0)
@@ -178,12 +179,15 @@ try:
             moddir = dir_path + '/AshesLauncher'
         if moddir == '/':
             moddir = dir_path + '/AshesLauncher'
+        if os.path.isfile(moddir + '/DarkSoulsIII.exe') is True:
+            moddir = dir_path + '/AshesLauncher'
         Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
         root.destroy()
 
 
     mod_list = []
     user_list = []
+
 
     def main():
         root = tkinter.Tk()
@@ -205,9 +209,10 @@ try:
                 browse()
             elif mod_name.get() == "Ashes":
                 ashes()
+            elif mod_name.get() == "Champions-Ashes-Dev":
+                ashes_dev()
             else:
                 launch()
-
 
         def vanilla():
             delete()
@@ -229,7 +234,8 @@ try:
                     config.read(os.path.abspath(f'{moddir}/{mod_name.get()}/modengine.ini'))
                     default_dir = config['files']['modOverrideDirectory'].replace('"',
                                                                                   '').replace(r"\AshesLauncher\Ashes",
-                                                                                              "")
+                                                                                              "").replace(
+                        r"\Champions-Ashes-Dev", "")
                     config.set('files', 'modOverrideDirectory',
                                fr'"\{moddir}\{mod_name.get()}{default_dir}"'.replace(f'{dir_path}/', ''))
                     with open(dir_path + '/modengine.ini', 'w+') as file:
@@ -289,10 +295,12 @@ try:
                         canvas.itemconfig(progress, text="Unpacking...")
 
             def install():
-                canvas.itemconfig(play_button, state='disabled')
                 global installing
                 ashes_panel_button1.config(state='disabled')
                 ashes_panel_button2.config(state='disabled')
+                ashes_panel_button3.config(state='disabled')
+                b1.config(state='disabled')
+                b2.config(state='disabled')
 
                 def git_connect():
                     try:
@@ -315,20 +323,26 @@ try:
                 canvas.itemconfig(play_button, state='normal')
                 ashes_panel_button1.config(state='normal')
                 ashes_panel_button2.config(state='normal')
+                ashes_panel_button3.config(state='normal')
+                b1.config(state='normal')
+                b2.config(state='normal')
 
             def update():
                 canvas.itemconfig(play_button, state='disabled')
                 ashes_panel_button1.config(state='disabled')
                 ashes_panel_button2.config(state='disabled')
+                ashes_panel_button3.config(state='disabled')
+                b1.config(state='disabled')
+                b2.config(state='disabled')
 
                 global installing
-                repo = git.Repo(moddir + "/Ashes")
 
                 def git_connect():
                     try:
                         repo = git.Repo(moddir + "/Ashes")
                         repo.git.fetch('--depth=1')
-                        repo.git.merge('-X', 'theirs', '--allow-unrelated-histories', '--no-commit', 'origin/master')
+                        repo.git.merge('-s', 'recursive', '-X', 'theirs', '--allow-unrelated-histories', '--no-commit'
+                                       , 'origin/master')
                         canvas.itemconfig(progress, text="")
                         canvas.itemconfig('progress', state='hidden')
                         canvas.itemconfig('proglines', state='hidden')
@@ -336,7 +350,7 @@ try:
                         state = messagebox.askretrycancel('AshesLauncher', "There was an error updating. Retry?")
                         if state is True:
                             git_connect()
-                        else:
+                        elif messagebox.askyesno('AshesLauncher', "Launch Game anyways?") is not True:
                             messagebox.showerror('AshesLauncher',
                                                  "Error for troubleshooting:\n" + traceback.format_exc())
 
@@ -346,6 +360,9 @@ try:
                 canvas.itemconfig(play_button, state='normal')
                 ashes_panel_button1.config(state='normal')
                 ashes_panel_button2.config(state='normal')
+                ashes_panel_button3.config(state='normal')
+                b1.config(state='normal')
+                b2.config(state='normal')
 
             def reset():
                 for files in os.listdir(moddir + "/Ashes/.git"):
@@ -408,6 +425,17 @@ try:
             else:
                 launch()
 
+        def ashes_dev():
+            if git_enabled == 1:
+                for files in os.listdir(moddir + "/Champions-Ashes-Dev/.git"):
+                    if files.endswith('.lock'):
+                        os.remove(moddir + "/Champions-Ashes-Dev/.git/" + files)
+                s = threading.Thread(target=update)
+                s.setDaemon(True)
+                s.start()
+            else:
+                launch()
+
         def delete():
             if os.path.isfile(dir_path + "/dinput8.dll"):
                 os.remove(dir_path + "/dinput8.dll")
@@ -434,6 +462,7 @@ try:
                 else:
                     settings_file.write(dir_path)
                     settings_file.close()
+
             check()
             if len(dir_path) >= 83:
                 game_path.set("..." + dir_path[-80:])
@@ -448,8 +477,8 @@ try:
                 moddir = dir_path + '/AshesLauncher'
             if moddir == '/':
                 moddir = dir_path + '/AshesLauncher'
-            if os.path.isfile(moddir + 'DarkSoulsIII.exe') is True:
-                moddir = moddir + 'AshesLauncher'
+            if os.path.isfile(moddir + '/DarkSoulsIII.exe') is True:
+                moddir = dir_path + '/AshesLauncher'
             moddir_file.write(moddir)
             moddir_file.close()
             if len(moddir) >= 83:
@@ -500,24 +529,44 @@ try:
             canvas.tag_bind(play_button, "<ButtonPress-1>", play_mod)
 
         def preset_vanilla(event):
-            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable VANILLA.cmd") is False:
-                messagebox.showerror("AshesLauncher", "Please install the mod first.")
+            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable VANILLA.cmd") is True:
+                cmd = subprocess.Popen(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable VANILLA.cmd"),
+                                       cwd=os.path.abspath(moddir + "/Ashes/GraphicPresets"), stdout=subprocess.PIPE,
+                                       stdin=subprocess.PIPE)
+                while cmd.poll() is None:
+                    if b'READY, Enjoy Ashes!\r\n' in cmd.stdout:
+                        cmd.communicate(b'\r\n')
+                messagebox.showinfo("Vanilla Preset", "Unchanged visuals.\nReady, Enjoy!")
             else:
-                os.startfile(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable VANILLA.cmd"))
+                messagebox.showerror("AshesLauncher", "Please install the mod first.")
 
         def preset_default(event):
-            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable PERFORMANCE.cmd") is False:
-                messagebox.showerror("AshesLauncher", "Please install the mod first.")
+            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable PERFORMANCE.cmd") is True:
+                cmd = subprocess.Popen(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable PERFORMANCE.cmd"),
+                                       cwd=os.path.abspath(moddir + "/Ashes/GraphicPresets"), stdout=subprocess.PIPE,
+                                       stdin=subprocess.PIPE)
+                while cmd.poll() is None:
+                    if b'READY, Enjoy Ashes!\r\n' in cmd.stdout:
+                        cmd.communicate(b'\r\n')
+                messagebox.showinfo("Default Preset", "Improved visuals with minimal performance loss.\nReady, Enjoy!")
             else:
-                os.startfile(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable PERFORMANCE.cmd"))
+                messagebox.showerror("AshesLauncher", "Please install the mod first.")
 
         def preset_fidelity(event):
-            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable PERFORMANCE.cmd") is False:
-                messagebox.showerror("AshesLauncher", "Please install the mod first.")
+            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable FIDELITY.cmd") is True:
+                cmd = subprocess.Popen(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable FIDELITY.cmd"),
+                                       cwd=os.path.abspath(moddir + "/Ashes/GraphicPresets"), stdout=subprocess.PIPE,
+                                       stdin=subprocess.PIPE)
+                while cmd.poll() is None:
+                    if b'READY, Enjoy Ashes!\r\n' in cmd.stdout:
+                        cmd.communicate(b'\r\n')
+                messagebox.showinfo("Fidelity Preset", "[EXPERIMENTAL, SOME GLITCHES MIGHT OCCUR]\nAmazing visuals or "
+                                                     "burning PC, either way you will see the light!\nReady, Enjoy!")
             else:
-                os.startfile(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable FIDELITY.cmd"))
+                messagebox.showerror("AshesLauncher", "Please install the mod first.")
 
         """ Swap Tabs"""
+
         def tab_select(i, event):
             if i == 'home':
                 canvas.itemconfig('home', state='normal')
@@ -562,17 +611,18 @@ try:
                 canvas_patch.place_forget()
                 count = 0
                 for radio in mod_list:
-                    radio.place(x=50, y=150 + count*45)
+                    radio.place(x=50, y=150 + count * 45)
                     count += 1
                 count = 0
                 for radio in user_list:
-                    radio.place(x=680, y=370 + count*45)
-                    count +=1
+                    radio.place(x=680, y=370 + count * 45)
+                    count += 1
                 path_panel1.place(x=50, y=605)
                 path_panel2.place(x=50, y=660)
                 ashes_panel_button1.place(x=680, y=150)
                 ashes_panel_button2.place(x=680, y=195)
                 ashes_panel_button3.place(x=680, y=240)
+
         canvas = tkinter.Canvas(width=1280, height=720, bg='black', highlightthickness=0)
         canvas.pack(expand=tkinter.YES, fill=tkinter.BOTH)
 
@@ -658,18 +708,18 @@ try:
                                             state='hidden')
         canvas.create_rectangle(80, 634, 80, 646, fill='#ebd7aa', width=0, state='hidden',
                                 tags=['progress', 'proglines', 'home'])
-        progress = canvas.create_text(612, 610, text='', fill='#e4dfd4', font=('Friz Quadrata Std', 16), tags='home')
+        progress = canvas.create_text(612, 614, text='', fill='#e4dfd4', font=('Friz Quadrata Std', 16), tags='home')
         play_button = canvas.create_image(1282, 600, image=play, anchor=tkinter.NE, tags='home')
         mod_button = canvas.create_image(1282, 600, image=disabled, anchor=tkinter.SE, tags='home')
         canvas.create_rectangle(0, 56, 1280, 58, fill='#ba9749', width=0)
 
         if os.path.isfile(moddir + "/Ashes/_version.txt"):
             version = open(moddir + "/Ashes/_version.txt", 'r').read()
-            canvas.create_text(10, 690, text=f"Installed Version {version}/Launcher Version 1.3",
+            canvas.create_text(10, 690, text=f"Installed Version {version}/Launcher Version 1.3.1",
                                font=("Friz Quadrata Std", 14),
                                fill="white", anchor=tkinter.NW, tags='home')
         else:
-            canvas.create_text(10, 690, text="Launcher Version 1.3",
+            canvas.create_text(10, 690, text="Launcher Version 1.3.1",
                                font=("Friz Quadrata Std", 14),
                                fill="white", anchor=tkinter.NW, tags='home')
 
@@ -734,21 +784,21 @@ try:
                             state='hidden')
 
         canvas.create_text(150, 280,
-                           text='The preset closest to the vanilla game. The least graphically demanding preset.\n\n'
-                                'For those who prefer lighting closer to vanilla or have issues running the '
+                           text='The preset closest to the vanilla game. The least demanding preset.\n\n'
+                                'For those who prefer lighting closer to vanilla or have issues with '
                                 'other presets.',
-                           fill='#e4dfd4', width=250,
+                           fill='#e4dfd4', width=250, justify=tkinter.CENTER,
                            font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
         canvas.create_text(520, 280,
-                           text="The default preset for Ashes. Similar to fidelity with an emphasis on "
-                                "performance.\n\n"
-                                "For those who prefer the new graphical changes but have issues running fidelity.",
-                           fill='#e4dfd4', width=250,
+                           text="The default preset. Similar to fidelity with an emphasis on "
+                                "performance and stability.\n\n"
+                                "For those who prefer the new graphical changes but have issues with fidelity.",
+                           fill='#e4dfd4', width=250, justify=tkinter.CENTER,
                            font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
         canvas.create_text(890, 280,
-                           text="The intended preset for Ashes. The most graphically demanding preset.\n\n"
+                           text="The best the mod has to offer. Glitches may occur. The most demanding preset.\n\n"
                                 'For those who want to experience the new graphical changes at their finest.',
-                           fill='#e4dfd4', width=250,
+                           fill='#e4dfd4', width=250, justify=tkinter.CENTER,
                            font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
 
         vanilla_panel = canvas.create_rectangle(115, 115, 425, 615, fill='', width=0, state='hidden', tags='graphics')
@@ -782,6 +832,18 @@ try:
                                                     overrelief=tkinter.RIDGE)
 
                         mod_list.append(radio)
+                    elif mod == "Champions-Ashes-Dev":
+                        radio = tkinter.Radiobutton(root, indicatoron=0, text="Champion's Ashes Dev",
+                                                    variable=mod_name, value=mod,
+                                                    width=45, bg='#141414', fg='#e4dfd4', selectcolor='#273355',
+                                                    bd=1, activeforeground='#0f0f0f',
+                                                    activebackground='#e4dfd4',
+                                                    command=modchosen, font=("FOT-Matisse Pro M", 14),
+                                                    relief=tkinter.GROOVE, offrelief=tkinter.GROOVE,
+                                                    overrelief=tkinter.RIDGE)
+
+                        mod_list.append(radio)
+
                     else:
                         radio = tkinter.Radiobutton(root, indicatoron=0, text=mod, variable=mod_name, value=mod,
                                                     width=45, bg='#141414', fg='#e4dfd4', selectcolor='#273355',
@@ -814,17 +876,19 @@ try:
                       fg='#f0deb4').grid(column=0, row=0, padx=10)
         tkinter.Label(path_panel1, width=78, textvariable=game_path, font=("FOT-Matisse Pro M", 14), bg='#141414',
                       fg='#e4dfd4').grid(column=1, row=0, padx=0, pady=5)
-        tkinter.Button(path_panel1, text='Browse', bd=0, font=('Friz Quadrata Std', 12), bg='#141414',
-                       fg='#f0deb4', command=browse, relief=tkinter.FLAT, activeforeground='#0f0f0f',
-                       activebackground='#e4dfd4').grid(column=2, row=0, padx=10)
+        b1 = tkinter.Button(path_panel1, text='Browse', bd=0, font=('Friz Quadrata Std', 12), bg='#141414',
+                            fg='#f0deb4', command=browse, relief=tkinter.FLAT, activeforeground='#0f0f0f',
+                            activebackground='#e4dfd4')
+        b1.grid(column=2, row=0, padx=10)
         tkinter.Label(path_panel2, text='Mods Path: ', font=("FOT-Matisse Pro B", 14), bg='#141414',
                       fg='#f0deb4').grid(column=0, row=0, padx=10)
         tkinter.Label(path_panel2, width=78, textvariable=mod_path, font=("FOT-Matisse Pro M", 14), bg='#141414',
                       fg='#e4dfd4').grid(column=1, row=0, pady=5, padx=2)
-        tkinter.Button(path_panel2, text='Browse', bd=0, font=('Friz Quadrata Std', 12), bg='#141414',
-                       fg='#f0deb4', command=browse_mod, relief=tkinter.FLAT,
-                       activeforeground='#0f0f0f',
-                       activebackground='#e4dfd4').grid(column=2, row=0, padx=10)
+        b2 = tkinter.Button(path_panel2, text='Browse', bd=0, font=('Friz Quadrata Std', 12), bg='#141414',
+                            fg='#f0deb4', command=browse_mod, relief=tkinter.FLAT,
+                            activeforeground='#0f0f0f',
+                            activebackground='#e4dfd4')
+        b2.grid(column=2, row=0, padx=10)
         canvas.create_image(680, 100, image=ashes_img, state='hidden', anchor=tkinter.NW, tags='mods')
 
         ashes_panel_button1 = tkinter.Button(root, text='Reset All Files', bd=1, font=("FOT-Matisse Pro M", 14),
@@ -844,7 +908,7 @@ try:
 
         def switch_account():
             os.system("taskkill /f /im steam.exe")
-            registry_steam = winreg.CreateKey(winreg.HKEY_CURRENT_USER, "Software\Valve\Steam")
+            registry_steam = winreg.CreateKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
             winreg.SetValueEx(registry_steam, 'AutoLoginUser', 0, winreg.REG_SZ, current_username.get())
             winreg.SetValueEx(registry_steam, 'RememberPassword', 0, winreg.REG_DWORD, 1)
             os.system("start steam:")
@@ -854,8 +918,8 @@ try:
             config = configparser.ConfigParser()
             config.read(os.path.abspath('./accounts.ini'))
             if config['enable']['enable'] == 'True':
-                canvas.create_image(680, 320, image=accs_img, state='hidden', anchor=tkinter.NW, tags='mods')
-                registry_steam = winreg.CreateKey(winreg.HKEY_CURRENT_USER, "Software\Valve\Steam")
+                canvas.create_image(680, 330, image=accs_img, state='hidden', anchor=tkinter.NW, tags='mods')
+                registry_steam = winreg.CreateKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
                 current_username = tkinter.StringVar(root, winreg.QueryValueEx(registry_steam, 'AutoLoginUser')[0])
                 winreg.CloseKey(registry_steam)
                 config = configparser.ConfigParser()
