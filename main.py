@@ -341,13 +341,16 @@ try:
                     try:
                         repo = git.Repo(moddir + "/Ashes")
                         repo.git.fetch('--depth=1')
-                        repo.git.merge('-s', 'recursive', '-X', 'theirs', '--allow-unrelated-histories', '--no-commit'
+                        repo.git.merge('--autostash', '--allow-unrelated-histories', '--no-commit'
                                        , 'origin/master')
+                        repo.git.reset('$(git diff --name-only')
+                        repo.git.restore('$(git diff --name-only')
+                        repo.git.stash('drop')
                         canvas.itemconfig(progress, text="")
                         canvas.itemconfig('progress', state='hidden')
                         canvas.itemconfig('proglines', state='hidden')
                     except Exception:
-                        state = messagebox.askretrycancel('AshesLauncher', "There was an error updating. Retry?")
+                        state = messagebox.askretrycancel('AshesLauncher', "There was an error updating. Retry? (Press Reset Files in MOD tab if issue persists.)")
                         if state is True:
                             git_connect()
                         elif messagebox.askyesno('AshesLauncher', "Launch Game anyways?") is not True:
@@ -587,18 +590,6 @@ try:
             else:
                 messagebox.showerror("AshesLauncher", "Please install the mod first.")
 
-        def preset_fidelity(event):
-            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable FIDELITY.cmd") is True:
-                cmd = subprocess.Popen(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable FIDELITY.cmd"),
-                                       cwd=os.path.abspath(moddir + "/Ashes/GraphicPresets"), stdout=subprocess.PIPE,
-                                       stdin=subprocess.PIPE)
-                while cmd.poll() is None:
-                    if b'READY, Enjoy Ashes!\r\n' in cmd.stdout:
-                        cmd.communicate(b'\r\n')
-                messagebox.showinfo("Fidelity Preset", "[EXPERIMENTAL, SOME GLITCHES MIGHT OCCUR]\nAmazing visuals or "
-                                                     "burning PC, either way you will see the light!\nReady, Enjoy!")
-            else:
-                messagebox.showerror("AshesLauncher", "Please install the mod first.")
 
         """ Swap Tabs"""
 
@@ -677,7 +668,6 @@ try:
         graph = tkinter.PhotoImage(file=resource_path('graphics_panel.png'))
         vanilla_text = tkinter.PhotoImage(file=resource_path('vanilla.png'))
         default_text = tkinter.PhotoImage(file=resource_path('default.png'))
-        fidelity_text = tkinter.PhotoImage(file=resource_path('fidelity.png'))
         graph_select = tkinter.PhotoImage(file=resource_path('graphics_panel_select.png'))
         discord = tkinter.PhotoImage(file=resource_path('discord.png'))
         changelog = tkinter.PhotoImage(file=resource_path('changelog.png'))
@@ -809,36 +799,28 @@ try:
         """GRAPHICS"""
 
         canvas.create_image(270, 365, image=graph, tags=('graphics', 'vanilla'), state='hidden')
-        canvas.create_image(640, 365, image=graph, tags=('graphics', 'default'), state='hidden')
-        canvas.create_image(1010, 365, image=graph, tags=('graphics', 'fidelity'), state='hidden')
+        canvas.create_image(1010, 365, image=graph, tags=('graphics', 'default'), state='hidden')
 
         canvas.create_image(270, 175, image=vanilla_text, tags='graphics', state='hidden')
-        canvas.create_image(640, 175, image=default_text, tags='graphics',
-                            state='hidden')
-        canvas.create_image(1010, 175, image=fidelity_text, tags='graphics',
+        canvas.create_image(1010, 175, image=default_text, tags='graphics',
                             state='hidden')
 
         canvas.create_text(150, 280,
-                           text='The preset closest to the vanilla game. The least demanding preset.\n\n'
+                           text='The preset closest to the vanilla game. Provides maximum performance but lacks'
+                                the new lighting changes.\n\n'
                                 'For those who prefer lighting closer to vanilla or have issues with '
-                                'other presets.',
-                           fill='#e4dfd4', width=250, justify=tkinter.CENTER,
-                           font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
-        canvas.create_text(520, 280,
-                           text="The default preset. Similar to fidelity with an emphasis on "
-                                "performance and stability.\n\n"
-                                "For those who prefer the new graphical changes but have issues with fidelity.",
+                                'the default preset.',
                            fill='#e4dfd4', width=250, justify=tkinter.CENTER,
                            font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
         canvas.create_text(890, 280,
-                           text="The best the mod has to offer. Glitches may occur. The most demanding preset.\n\n"
-                                'For those who want to experience the new graphical changes at their finest.',
+                           text="The default preset. Features new and improved lighting with minimal performance "
+                                "cost on most systems.\n\n"
+                                "For those who prefer the new graphical changes and can afford the performance cost.",
                            fill='#e4dfd4', width=250, justify=tkinter.CENTER,
                            font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
 
         vanilla_panel = canvas.create_rectangle(115, 115, 425, 615, fill='', width=0, state='hidden', tags='graphics')
-        default_panel = canvas.create_rectangle(485, 115, 795, 615, fill='', width=0, state='hidden', tags='graphics')
-        fidelity_panel = canvas.create_rectangle(855, 115, 1165, 615, fill='', width=0, state='hidden', tags='graphics')
+        default_panel = canvas.create_rectangle(885, 115, 1165, 615, fill='', width=0, state='hidden', tags='graphics')
 
         '''MODS'''
         if lastmod == '':
@@ -989,11 +971,8 @@ try:
         canvas.tag_bind(vanilla_panel, "<Leave>", lambda event: canvas.itemconfig('vanilla', image=graph))
         canvas.tag_bind(default_panel, "<Enter>", lambda event: canvas.itemconfig('default', image=graph_select))
         canvas.tag_bind(default_panel, "<Leave>", lambda event: canvas.itemconfig('default', image=graph))
-        canvas.tag_bind(fidelity_panel, "<Enter>", lambda event: canvas.itemconfig('fidelity', image=graph_select))
-        canvas.tag_bind(fidelity_panel, "<Leave>", lambda event: canvas.itemconfig('fidelity', image=graph))
         canvas.tag_bind(vanilla_panel, "<ButtonPress-1>", preset_vanilla)
         canvas.tag_bind(default_panel, "<ButtonPress-1>", preset_default)
-        canvas.tag_bind(fidelity_panel, "<ButtonPress-1>", preset_fidelity)
         canvas.tag_bind(discord_panel, "<Enter>", lambda event: canvas.itemconfig(discord_panel, image=home_select))
         canvas.tag_bind(discord_panel, "<Leave>", lambda event: canvas.itemconfig(discord_panel, image=home))
         canvas.tag_bind(changelog_panel, "<Enter>", lambda event: canvas.itemconfig(changelog_panel, image=home_select))
