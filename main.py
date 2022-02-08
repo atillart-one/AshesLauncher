@@ -736,11 +736,7 @@ try:
 
         if os.path.isfile(moddir + "/Ashes/_version.txt"):
             version = open(moddir + "/Ashes/_version.txt", 'r').read()
-            canvas.create_text(10, 690, text=f"Installed Version {version}/Launcher Version 1.3.1",
-                               font=("Friz Quadrata Std", 14),
-                               fill="white", anchor=tkinter.NW, tags='home')
-        else:
-            canvas.create_text(10, 690, text="Launcher Version 1.3.1",
+            canvas.create_text(10, 690, text=f"Champion's Ashes Version {version}",
                                font=("Friz Quadrata Std", 14),
                                fill="white", anchor=tkinter.NW, tags='home')
 
