@@ -450,15 +450,13 @@ try:
             if git_enabled == 1:
                 if os.path.isdir(moddir + "/Ashes/.git") is False:
                     Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
-                    s = threading.Thread(target=install)
-                    s.setDaemon(True)
+                    s = threading.Thread(target=install, daemon=True)
                     s.start()
                 else:
                     for files in os.listdir(moddir + "/Ashes/.git"):
                         if files.endswith('.lock'):
                             os.remove(moddir + "/Ashes/.git/" + files)
-                    s = threading.Thread(target=update)
-                    s.setDaemon(True)
+                    s = threading.Thread(target=update, daemon=True)
                     s.start()
             else:
                 launch()
@@ -468,8 +466,7 @@ try:
                 for files in os.listdir(moddir + "/Champions-Ashes-Dev/.git"):
                     if files.endswith('.lock'):
                         os.remove(moddir + "/Champions-Ashes-Dev/.git/" + files)
-                s = threading.Thread(target=update_dev)
-                s.setDaemon(True)
+                s = threading.Thread(target=update_dev, daemon=True)
                 s.start()
             else:
                 launch()
@@ -711,8 +708,7 @@ try:
             except Exception:
                 return
 
-        s = threading.Thread(target=get_bg)
-        s.setDaemon(True)
+        s = threading.Thread(target=get_bg,daemon=True)
         s.start()
         """Main Canvas"""
         canvas.create_image(0, 0, image=bg, anchor=tkinter.NW, tags='background')
@@ -798,29 +794,27 @@ try:
 
         """GRAPHICS"""
 
-        canvas.create_image(270, 365, image=graph, tags=('graphics', 'vanilla'), state='hidden')
-        canvas.create_image(1010, 365, image=graph, tags=('graphics', 'default'), state='hidden')
+        canvas.create_image(470, 365, image=graph, tags=('graphics', 'vanilla'), state='hidden')
+        canvas.create_image(810, 365, image=graph, tags=('graphics', 'default'), state='hidden')
 
-        canvas.create_image(270, 175, image=vanilla_text, tags='graphics', state='hidden')
-        canvas.create_image(1010, 175, image=default_text, tags='graphics',
+        canvas.create_image(470, 175, image=vanilla_text, tags='graphics', state='hidden')
+        canvas.create_image(810, 175, image=default_text, tags='graphics',
                             state='hidden')
 
-        canvas.create_text(150, 280,
-                           text='The preset closest to the vanilla game. Provides maximum performance but lacks'
-                                the new lighting changes.\n\n'
+        canvas.create_text(350, 280,
+                           text='The preset closest to the vanilla game. Easier to run than the default preset.\n\n'
                                 'For those who prefer lighting closer to vanilla or have issues with '
                                 'the default preset.',
                            fill='#e4dfd4', width=250, justify=tkinter.CENTER,
                            font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
-        canvas.create_text(890, 280,
-                           text="The default preset. Features new and improved lighting with minimal performance "
-                                "cost on most systems.\n\n"
-                                "For those who prefer the new graphical changes and can afford the performance cost.",
+        canvas.create_text(690, 280,
+                           text="The default preset for Champion's Ashes. Features new and improved lighting.\n\n"
+                                "For those who wish to experience the new graphical changes.",
                            fill='#e4dfd4', width=250, justify=tkinter.CENTER,
                            font=("Friz Quadrata Std", 14), tags='graphics', state='hidden', anchor=tkinter.NW)
 
-        vanilla_panel = canvas.create_rectangle(115, 115, 425, 615, fill='', width=0, state='hidden', tags='graphics')
-        default_panel = canvas.create_rectangle(885, 115, 1165, 615, fill='', width=0, state='hidden', tags='graphics')
+        vanilla_panel = canvas.create_rectangle(315, 115, 625, 615, fill='', width=0, state='hidden', tags='graphics')
+        default_panel = canvas.create_rectangle(685, 115, 965, 615, fill='', width=0, state='hidden', tags='graphics')
 
         '''MODS'''
         if lastmod == '':
