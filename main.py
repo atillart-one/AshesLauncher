@@ -295,115 +295,170 @@ try:
                         canvas.itemconfig(progress, text="Unpacking...")
 
             def install():
-                global installing
-                ashes_panel_button1.config(state='disabled')
-                ashes_panel_button2.config(state='disabled')
-                ashes_panel_button3.config(state='disabled')
-                b1.config(state='disabled')
-                b2.config(state='disabled')
+                try:
+                    canvas.itemconfig(play_button, state='disabled')
+                    ashes_panel_button1.config(state='disabled')
+                    ashes_panel_button2.config(state='disabled')
+                    ashes_panel_button3.config(state='disabled')
+                    b1.config(state='disabled')
+                    b2.config(state='disabled')
 
-                def git_connect():
-                    try:
-                        git.Repo.clone_from("https://github.com/SirHalvard/Champions-Ashes",
-                                            moddir + "/Ashes", progress=CloneProgress(), depth=1)
-                        canvas.itemconfig(progress, text="")
-                        canvas.itemconfig('progress', state='hidden')
-                        canvas.itemconfig('proglines', state='hidden')
-                        launch()
-                    except Exception:
-                        state = messagebox.askretrycancel('AshesLauncher', "There was an error installing. Retry?")
-                        if state is True:
-                            git_connect()
+                    global installing
+                    git.Repo.clone_from("https://github.com/SirHalvard/Champions-Ashes",
+                                        moddir + "/Ashes", progress=CloneProgress(), depth=1)
+                    canvas.itemconfig(progress, text="")
+                    canvas.itemconfig('progress', state='hidden')
+                    canvas.itemconfig('proglines', state='hidden')
+                    launch()
+                    installing = 0
+                    canvas.itemconfig(play_button, state='normal')
+                    ashes_panel_button1.config(state='normal')
+                    ashes_panel_button2.config(state='normal')
+                    ashes_panel_button3.config(state='normal')
+                    b1.config(state='normal')
+                    b2.config(state='normal')
+
+                except Exception:
+                    state = messagebox.askretrycancel('AshesLauncher',
+                                                      "There was an error installing. Retry?")
+                    if state is True:
+                        install()
+                    else:
+                        switch = messagebox.askyesno('AshesLauncher', "Launch Game anyways?")
+                        if switch is True:
+                            launch()
+                            installing = 0
+                            canvas.itemconfig(play_button, state='normal')
+                            ashes_panel_button1.config(state='normal')
+                            ashes_panel_button2.config(state='normal')
+                            ashes_panel_button3.config(state='normal')
+                            b1.config(state='normal')
+                            b2.config(state='normal')
+
                         else:
                             messagebox.showerror('AshesLauncher',
                                                  "Error for troubleshooting:\n" + traceback.format_exc())
+                            installing = 0
+                            canvas.itemconfig(play_button, state='normal')
+                            ashes_panel_button1.config(state='normal')
+                            ashes_panel_button2.config(state='normal')
+                            ashes_panel_button3.config(state='normal')
+                            b1.config(state='normal')
+                            b2.config(state='normal')
 
-                git_connect()
-                installing = 0
-                canvas.itemconfig(play_button, state='normal')
-                ashes_panel_button1.config(state='normal')
-                ashes_panel_button2.config(state='normal')
-                ashes_panel_button3.config(state='normal')
-                b1.config(state='normal')
-                b2.config(state='normal')
 
             def update():
-                canvas.itemconfig(play_button, state='disabled')
-                ashes_panel_button1.config(state='disabled')
-                ashes_panel_button2.config(state='disabled')
-                ashes_panel_button3.config(state='disabled')
-                b1.config(state='disabled')
-                b2.config(state='disabled')
+                try:
+                    canvas.itemconfig(play_button, state='disabled')
+                    ashes_panel_button1.config(state='disabled')
+                    ashes_panel_button2.config(state='disabled')
+                    ashes_panel_button3.config(state='disabled')
+                    b1.config(state='disabled')
+                    b2.config(state='disabled')
 
-                global installing
-
-                def git_connect():
+                    global installing
+                    repo = git.Repo(moddir + "/Ashes")
+                    repo.git.fetch('--depth=1')
                     try:
-                        repo = git.Repo(moddir + "/Ashes")
-                        repo.git.fetch('--depth=1')
-                        try:
-                            repo.git.merge('-Xtheirs', '--allow-unrelated-histories', '--no=commit', 'origin/master')
-                        except Exception:
-                            repo.git.merge('--autostash', '--allow-unrelated-histories', '--no-commit'
-                                       , 'origin/master')
-                            repo.git.reset('$(git diff --name-only')
-                            repo.git.restore('$(git diff --name-only')
-                            repo.git.stash('drop')
-                        canvas.itemconfig(progress, text="")
-                        canvas.itemconfig('progress', state='hidden')
-                        canvas.itemconfig('proglines', state='hidden')
+                        repo.git.merge('-Xtheirs', '--allow-unrelated-histories', '--no=commit', 'origin/master')
                     except Exception:
-                        state = messagebox.askretrycancel('AshesLauncher', "There was an error updating. Retry? (Press Reset Files in MOD tab if issue persists.)")
-                        if state is True:
-                            git_connect()
-                        elif messagebox.askyesno('AshesLauncher', "Launch Game anyways?") is not True:
+                        repo.git.merge('--autostash', '--allow-unrelated-histories', '--no-commit', 'origin/master')
+                        repo.git.reset('$(git diff --name-only')
+                        repo.git.restore('$(git diff --name-only')
+                        repo.git.stash('drop')
+                    canvas.itemconfig(progress, text="")
+                    canvas.itemconfig('progress', state='hidden')
+                    canvas.itemconfig('proglines', state='hidden')
+                    launch()
+                    installing = 0
+                    canvas.itemconfig(play_button, state='normal')
+                    ashes_panel_button1.config(state='normal')
+                    ashes_panel_button2.config(state='normal')
+                    ashes_panel_button3.config(state='normal')
+                    b1.config(state='normal')
+                    b2.config(state='normal')
+
+                except Exception:
+                    state = messagebox.askretrycancel('AshesLauncher',
+                                                      "There was an error updating. Retry? "
+                                                      "(Reset All Files in MOD tab may help if issue persists.)")
+                    if state is True:
+                        update()
+                    else:
+                        switch = messagebox.askyesno('AshesLauncher', "Launch Game anyways?")
+                        if switch is True:
+                            launch()
+                            installing = 0
+                            canvas.itemconfig(play_button, state='normal')
+                            ashes_panel_button1.config(state='normal')
+                            ashes_panel_button2.config(state='normal')
+                            ashes_panel_button3.config(state='normal')
+                            b1.config(state='normal')
+                            b2.config(state='normal')
+
+                        else:
                             messagebox.showerror('AshesLauncher',
                                                  "Error for troubleshooting:\n" + traceback.format_exc())
+                            installing = 0
+                            canvas.itemconfig(play_button, state='normal')
+                            ashes_panel_button1.config(state='normal')
+                            ashes_panel_button2.config(state='normal')
+                            ashes_panel_button3.config(state='normal')
+                            b1.config(state='normal')
+                            b2.config(state='normal')
 
-                git_connect()
-                launch()
-                installing = 0
-                canvas.itemconfig(play_button, state='normal')
-                ashes_panel_button1.config(state='normal')
-                ashes_panel_button2.config(state='normal')
-                ashes_panel_button3.config(state='normal')
-                b1.config(state='normal')
-                b2.config(state='normal')
 
             def update_dev():
-                canvas.itemconfig(play_button, state='disabled')
-                ashes_panel_button1.config(state='disabled')
-                ashes_panel_button2.config(state='disabled')
-                ashes_panel_button3.config(state='disabled')
-                b1.config(state='disabled')
-                b2.config(state='disabled')
+                try:
+                    canvas.itemconfig(play_button, state='disabled')
+                    ashes_panel_button1.config(state='disabled')
+                    ashes_panel_button2.config(state='disabled')
+                    ashes_panel_button3.config(state='disabled')
+                    b1.config(state='disabled')
+                    b2.config(state='disabled')
 
-                global installing
+                    global installing
+                    repo = git.Repo(moddir + "/Champions-Ashes-Dev")
+                    repo.git.pull
+                    canvas.itemconfig('progress', state='hidden')
+                    canvas.itemconfig('proglines', state='hidden')
+                    launch()
+                    installing = 0
+                    canvas.itemconfig(play_button, state='normal')
+                    ashes_panel_button1.config(state='normal')
+                    ashes_panel_button2.config(state='normal')
+                    ashes_panel_button3.config(state='normal')
+                    b1.config(state='normal')
+                    b2.config(state='normal')
 
-                def git_connect():
-                    try:
-                        repo = git.Repo(moddir + "/Champions-Ashes-Dev")
-                        repo.git.pull()
-                        canvas.itemconfig(progress, text="")
-                        canvas.itemconfig('progress', state='hidden')
-                        canvas.itemconfig('proglines', state='hidden')
-                    except Exception:
-                        state = messagebox.askretrycancel('AshesLauncher', "There was an error updating. Retry?")
-                        if state is True:
-                            git_connect()
-                        elif messagebox.askyesno('AshesLauncher', "Launch Game anyways?") is not True:
+                except Exception:
+                    state = messagebox.askretrycancel('AshesLauncher',
+                                                      "There was an error updating. Retry? "
+                                                      "(Reset All Files in MOD tab may help if issue persists.)")
+                    if state is True:
+                        update_dev()
+                    else:
+                        switch = messagebox.askyesno('AshesLauncher', "Launch Game anyways?")
+                        if switch is True:
+                            launch()
+                            installing = 0
+                            canvas.itemconfig(play_button, state='normal')
+                            ashes_panel_button1.config(state='normal')
+                            ashes_panel_button2.config(state='normal')
+                            ashes_panel_button3.config(state='normal')
+                            b1.config(state='normal')
+                            b2.config(state='normal')
+
+                        else:
                             messagebox.showerror('AshesLauncher',
                                                  "Error for troubleshooting:\n" + traceback.format_exc())
-
-                git_connect()
-                launch()
-                installing = 0
-                canvas.itemconfig(play_button, state='normal')
-                ashes_panel_button1.config(state='normal')
-                ashes_panel_button2.config(state='normal')
-                ashes_panel_button3.config(state='normal')
-                b1.config(state='normal')
-                b2.config(state='normal')
+                            installing = 0
+                            canvas.itemconfig(play_button, state='normal')
+                            ashes_panel_button1.config(state='normal')
+                            ashes_panel_button2.config(state='normal')
+                            ashes_panel_button3.config(state='normal')
+                            b1.config(state='normal')
+                            b2.config(state='normal')
 
             def reset():
                 for files in os.listdir(moddir + "/Ashes/.git"):
@@ -694,8 +749,12 @@ try:
                         weight.append(1)
                     elif i == 2:
                         weight.append(1)
+                    elif i == 18:
+                        weight.append(1)
+                    elif i == 19:
+                        weight.append(1)
                     else:
-                        weight.append(round(998 / ((int(count) - 2))))
+                        weight.append(round(46 / ((int(count) - 4))))
                 num_img = random.choices(range(1, int(count) + 1), weights=weight)
                 response = requests.get(
                     "https://raw.githubusercontent.com/Atillart-One/AshesLauncher/main/images/"
