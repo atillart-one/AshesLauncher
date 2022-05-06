@@ -109,7 +109,7 @@ try:
 
 
     """
-    Creates (if it doesn't exist) and reads the needed variables.
+    Creates (if file doesn't exist) and reads the needed variables.
     """
     Path("C:/ProgramData/AshesLauncher").mkdir(exist_ok=True)
     if os.path.isfile("C:/ProgramData/AshesLauncher/settings.txt"):
@@ -132,6 +132,7 @@ try:
 
 
     installing = 0
+    private_servers = 0
 
 
     def report_callback_exception(self, exc, val, tb):
@@ -216,7 +217,14 @@ try:
 
         def vanilla():
             delete()
-            webbrowser.open('steam://rungameid/374320')
+            global private_servers
+            if private_servers == 0:
+                webbrowser.open('steam://rungameid/374320')
+            elif os.path.isfile(os.path.abspath("./files/ds3os/Loader/loader.exe")):
+                subprocess.Popen(os.path.abspath("./files/ds3os/Loader/loader.exe"))
+            else:
+                messagebox.showerror("AshesLauncher", "DS3 Open Server not found. Please install it under the 'ds3os' "
+                                                      "folder inside the 'files' folder.")
 
         def launch():
             delete()
@@ -274,7 +282,14 @@ try:
 
                 shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
             shutil.copy("files/lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
-            webbrowser.open('steam://rungameid/374320')
+            global private_servers
+            if private_servers == 0:
+                webbrowser.open('steam://rungameid/374320')
+            elif os.path.isfile(os.path.abspath("./ds3os/Loader/loader.exe")):
+                subprocess.Popen(os.path.abspath("./ds3os/Loader/loader.exe"))
+            else:
+                messagebox.showerror("AshesLauncher", "DS3 Open Server not found. Please install it under the 'ds3os' "
+                                                      "folder inside the 'files' folder..")
 
         if git_enabled == 1:
             class CloneProgress(git.RemoteProgress):
@@ -645,6 +660,15 @@ try:
             else:
                 messagebox.showerror("AshesLauncher", "Please install the mod first.")
 
+        def server_toggle(event):
+            global private_servers
+            if private_servers == 0:
+                canvas.itemconfig(checkbox, image=tick)
+                private_servers = 1
+
+            else:
+                canvas.itemconfig(checkbox, image=box)
+                private_servers = 0
 
         """ Swap Tabs"""
 
@@ -734,6 +758,8 @@ try:
         ashes_img = tkinter.PhotoImage(file=resource_path('ashes.png'))
         accs_img = tkinter.PhotoImage(file=resource_path('accounts.png'))
         logo = tkinter.PhotoImage(file=resource_path('logo.png'))
+        box = tkinter.PhotoImage(file=resource_path('box.png'))
+        tick = tkinter.PhotoImage(file=resource_path('tick.png'))
 
         """BACKGROUND"""
         bg = tkinter.PhotoImage(file=resource_path('bg.png'))
@@ -811,6 +837,12 @@ try:
         changelog_panel = canvas.create_image(1030, 355, image=changelog, tags='home', anchor=tkinter.NW)
 
         canvas.create_image(650, 220, image=logo, tags='home', anchor=tkinter.NW)
+
+        checkbox = canvas.create_image(40, 630, image=box, anchor=tkinter.NW, tags='home')
+        canvas.create_text(75, 632,
+                           text='Use Private Servers',
+                           fill='#e4dfd4', justify=tkinter.CENTER,
+                           font=("Friz Quadrata Std", 14), tags='home', anchor=tkinter.NW)
 
         """Display Patch Notes"""
         canvas.create_image(-3, 135, image=patch, anchor=tkinter.NW, tags='home')
@@ -1016,6 +1048,7 @@ try:
         canvas.tag_bind(mod_button, "<ButtonPress-1>", mod_enabled)
         canvas.tag_bind(mod_button, "<Enter>", lambda event: canvas.itemconfig(mod_button, image=disabled_select))
         canvas.tag_bind(mod_button, "<Leave>", lambda event: canvas.itemconfig(mod_button, image=disabled))
+        canvas.tag_bind(checkbox, '<ButtonPress-1>', server_toggle)
         canvas.tag_bind(home_button, '<ButtonPress-1>', lambda event: tab_select('home', event))
         canvas.tag_bind(graphics_button, '<ButtonPress-1>', lambda event: tab_select('graphics', event))
         canvas.tag_bind(mods_button, '<ButtonPress-1>', lambda event: tab_select('mods', event))

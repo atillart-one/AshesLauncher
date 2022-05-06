@@ -23,6 +23,7 @@ Under usernames, follow the instructions to add your accounts.
 
 ## Additional Notes
 The Champion's Ashes mod WILL ban you if you have it enabled and launch the game. Make sure it's disabled before using an account that you don't want banned.  
+The DS3 Open Server can be updated by replacing the files inside the ds3os folder.
 If you need to disable installing/updating Champion's Ashes, simply delete the Git folder in the files folder present in the launcher folder.  
 Storing mods outside the Game folder requires the launcher to be run with Administrator privileges. Simply right click AshesLauncher4.exe and select run as admin.
 
@@ -34,6 +35,7 @@ Discord: 	    https://discord.gg/xEMdvaTVc3
 ## Credits
 The Champion's Ashes team  (Champion's Ashes)   
 Church Guard (Lazy Loader: https://www.nexusmods.com/darksouls3/mods/677)  
+TLeonardUK (Dark Souls III Open Server: https://github.com/TLeonardUK/ds3os)
 
 Featuring background images from:  
 Nobody#6945  
