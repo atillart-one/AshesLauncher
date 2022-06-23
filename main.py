@@ -112,19 +112,14 @@ try:
     Creates (if file doesn't exist) and reads the needed variables.
     """
     Path("C:/ProgramData/AshesLauncher").mkdir(exist_ok=True)
-    if os.path.isfile("C:/ProgramData/AshesLauncher/settings.txt"):
-        settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "r")
-        dir_path = settings_file.read()
-        settings_file.close()
+    if os.path.isfile("settings.ini"):
+        config = configparser.ConfigParser()
+        config.read('settings.ini')
+        dir_path = config['settings']['Directory']
+        lastmod = config['settings']['LastMod']
     else:
         dir_path = os.path.abspath('.')
-    if os.path.isfile("C:/ProgramData/AshesLauncher/lastmod.txt"):
-        lastmod_file = open("C:/ProgramData/AshesLauncher/lastmod.txt", "r")
-        lastmod = lastmod_file.read()
-        lastmod_file.close()
-    else:
         lastmod = ''
-
 
     def onObjectClick(event):
         os.system("taskkill /f /im git.exe")
@@ -132,8 +127,10 @@ try:
 
 
     installing = 0
-    private_servers = 0
-
+    config = configparser.ConfigParser()
+    config.read('settings.ini')
+    private_servers = config['settings'].getboolean('use_private_servers')
+    gameRunner = ctypes.cdll.LoadLibrary('files/ChampionsAshesServerJoiner.dll')
 
     def report_callback_exception(self, exc, val, tb):
         messagebox.showerror("Error", message=str(val))
@@ -156,24 +153,23 @@ try:
             global dir_path
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                 if messagebox.askyesno("AshesLauncher", "Please select Game folder.") is True:
-                    settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w+")
+                    config = configparser.ConfigParser()
+                    config.read('settings.ini')
                     dir_path = filedialog.askdirectory()
                     if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                         check()
                     else:
-                        settings_file.write(dir_path)
-                        settings_file.close()
+                        config.set('settings', 'Directory', dir_path)
+                        with open('settings.ini', 'w+') as file:
+                            config.write(file)
                 else:
                     sys.exit(0)
 
         check()
         global moddir
-        if os.path.isfile("C:/ProgramData/AshesLauncher/moddir.txt"):
-            moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "r")
-            moddir = moddir_file.read()
-            moddir_file.close()
-        else:
-            moddir = ''
+        config = configparser.ConfigParser()
+        config.read('settings.ini')
+        moddir = config['settings']['Mods']
         if os.path.isdir(moddir) is False:
             moddir = dir_path + '/AshesLauncher'
         if moddir == '':
@@ -218,13 +214,10 @@ try:
         def vanilla():
             delete()
             global private_servers
-            if private_servers == 0:
+            if private_servers is False:
                 webbrowser.open('steam://rungameid/374320')
-            elif os.path.isfile(os.path.abspath("./files/ds3os/Loader/loader.exe")):
-                subprocess.Popen(os.path.abspath("./files/ds3os/Loader/loader.exe"))
             else:
-                messagebox.showerror("AshesLauncher", "DS3 Open Server not found. Please install it under the 'ds3os' "
-                                                      "folder inside the 'files' folder.")
+                gameRunner.join(dir_path + "/DarkSoulsIII.exe")
 
         def launch():
             delete()
@@ -283,13 +276,10 @@ try:
                 shutil.copy("files/lazyLoad/lazyLoad.ini", dir_path + "/lazyLoad.ini")
             shutil.copy("files/lazyLoad/dinput8.dll", dir_path + "/dinput8.dll")
             global private_servers
-            if private_servers == 0:
+            if private_servers is False:
                 webbrowser.open('steam://rungameid/374320')
-            elif os.path.isfile(os.path.abspath("./ds3os/Loader/loader.exe")):
-                subprocess.Popen(os.path.abspath("./ds3os/Loader/loader.exe"))
             else:
-                messagebox.showerror("AshesLauncher", "DS3 Open Server not found. Please install it under the 'ds3os' "
-                                                      "folder inside the 'files' folder..")
+                gameRunner.join(dir_path + "/DarkSoulsIII.exe")
 
         if git_enabled == 1:
             class CloneProgress(git.RemoteProgress):
@@ -500,11 +490,13 @@ try:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
                 browse()
             else:
-                moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "w+")
+                config = configparser.ConfigParser()
+                config.read('settings.ini')
                 global moddir
                 moddir = dir_path + "/AshesLauncher"
-                moddir_file.write(moddir)
-                moddir_file.close()
+                config.set('settings', 'Mods', moddir)
+                with open('settings.ini', 'w+') as file:
+                    config.write(file)
                 if len(moddir) >= 83:
                     mod_path.set("..." + moddir[-80:])
                 else:
@@ -558,18 +550,22 @@ try:
 
             def check():
                 global dir_path
-                settings_file = open("C:/ProgramData/AshesLauncher/settings.txt", "w+")
+                config = configparser.ConfigParser()
+                config.read('settings.ini')
+
                 if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                     if messagebox.askyesno("AshesLauncher", "Please select Game folder.") is True:
                         dir_path = filedialog.askdirectory()
                         if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                             check()
                         else:
-                            settings_file.write(dir_path)
-                            settings_file.close()
+                            config.set('settings', 'Directory', dir_path)
+                            with open('settings.ini', 'w+') as file:
+                                config.write(file)
                 else:
-                    settings_file.write(dir_path)
-                    settings_file.close()
+                    config.set('settings', 'Directory', dir_path)
+                    with open('settings.ini', 'w+') as file:
+                        config.write(file)
 
             check()
             if len(dir_path) >= 83:
@@ -578,17 +574,19 @@ try:
                 game_path.set(dir_path)
 
         def browse_mod():
-            moddir_file = open("C:/ProgramData/AshesLauncher/moddir.txt", "w+")
+            config = configparser.ConfigParser()
+            config.read('settings.ini')
             global moddir
-            moddir = filedialog.askdirectory()
+            moddir = config['settings']['Mods']
             if os.path.isdir(moddir) is False:
                 moddir = dir_path + '/AshesLauncher'
             if moddir == '/':
                 moddir = dir_path + '/AshesLauncher'
             if os.path.isfile(moddir + '/DarkSoulsIII.exe') is True:
                 moddir = dir_path + '/AshesLauncher'
-            moddir_file.write(moddir)
-            moddir_file.close()
+            config.set('settings', 'Mods', moddir)
+            with open('settings.ini', 'w+') as file:
+                config.write(file)
             if len(moddir) >= 83:
                 mod_path.set("..." + moddir[-80:])
             else:
@@ -662,13 +660,21 @@ try:
 
         def server_toggle(event):
             global private_servers
-            if private_servers == 0:
+            config = configparser.ConfigParser()
+            config.read('settings.ini')
+            if private_servers is False:
                 canvas.itemconfig(checkbox, image=tick)
-                private_servers = 1
+                private_servers = True
+                config.set('settings', 'use_private_servers', 'True')
+                with open('settings.ini', 'w+') as file:
+                    config.write(file)
 
             else:
                 canvas.itemconfig(checkbox, image=box)
-                private_servers = 0
+                private_servers = False
+                config.set('settings', 'use_private_servers', 'False')
+                with open('settings.ini', 'w+') as file:
+                    config.write(file)
 
         """ Swap Tabs"""
 
@@ -838,7 +844,13 @@ try:
 
         canvas.create_image(650, 220, image=logo, tags='home', anchor=tkinter.NW)
 
-        checkbox = canvas.create_image(40, 630, image=box, anchor=tkinter.NW, tags='home')
+        global private_servers
+        if private_servers is True:
+            checkbox = canvas.create_image(40, 630, image=tick, anchor=tkinter.NW, tags='home')
+
+        else:
+            checkbox = canvas.create_image(40, 630, image=box, anchor=tkinter.NW, tags='home')
+
         canvas.create_text(75, 632,
                            text='Use Private Servers',
                            fill='#e4dfd4', justify=tkinter.CENTER,
@@ -915,9 +927,11 @@ try:
         canvas.create_image(50, 100, image=mods_img, anchor=tkinter.NW, state='hidden', tags='mods')
 
         def modchosen():
-            lastmod_file = open("C:/ProgramData/AshesLauncher/lastmod.txt", "w+")
-            lastmod_file.write(mod_name.get())
-            lastmod_file.close()
+            config = configparser.ConfigParser()
+            config.read('settings.ini')
+            config.set('settings', 'LastMod', mod_name.get())
+            with open('settings.ini', 'w+') as file:
+                config.write(file)
 
         def mod_creation():
             for mod in os.listdir(moddir):
@@ -1015,16 +1029,16 @@ try:
             os.system("start steam:")
             winreg.CloseKey(registry_steam)
 
-        if os.path.isfile(os.path.abspath('./accounts.ini')):
+        if os.path.isfile('settings.ini'):
             config = configparser.ConfigParser()
-            config.read(os.path.abspath('./accounts.ini'))
+            config.read('settings.ini')
             if config['enable']['enable'] == 'True':
                 canvas.create_image(680, 330, image=accs_img, state='hidden', anchor=tkinter.NW, tags='mods')
                 registry_steam = winreg.CreateKey(winreg.HKEY_CURRENT_USER, r"Software\Valve\Steam")
                 current_username = tkinter.StringVar(root, winreg.QueryValueEx(registry_steam, 'AutoLoginUser')[0])
                 winreg.CloseKey(registry_steam)
                 config = configparser.ConfigParser()
-                config.read(os.path.abspath('./accounts.ini'))
+                config.read('settings.ini')
                 for username in config['usernames']:
                     radio = tkinter.Radiobutton(root, indicatoron=0, text=config['usernames'][username],
                                                 variable=current_username, value=username,
