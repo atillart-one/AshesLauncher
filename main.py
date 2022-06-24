@@ -365,11 +365,9 @@ try:
                     repo = git.Repo(moddir + "/Ashes")
                     repo.git.fetch('--depth=1')
                     try:
-                        repo.git.merge('-Xtheirs', '--allow-unrelated-histories', '--no=commit', 'origin/master')
+                        repo.git.merge('-Xtheirs', '--allow-unrelated-histories', '--no-commit', 'origin/master')
                     except Exception:
                         repo.git.merge('--autostash', '--allow-unrelated-histories', '--no-commit', 'origin/master')
-                        repo.git.reset('$(git diff --name-only)')
-                        repo.git.restore('$(git diff --name-only)')
                         repo.git.stash('drop')
                     canvas.itemconfig(progress, text="")
                     canvas.itemconfig('progress', state='hidden')

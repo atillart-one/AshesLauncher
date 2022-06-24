@@ -18,10 +18,11 @@ These files are all present in a folder named "The Convergence" (can be named an
 
 ## Switching Accounts
 To switch accounts, open the included settings.ini in your launcher folder and change enabled = False to enabled = True.
-Under usernames, follow the instructions to add your accounts.
+Under usernames, add the usernames for your accounts. More usernames can be added by following the format  
+steam username = name displayed in launcher
 
 ## Additional Notes
-The Champion's Ashes mod WILL ban you if you used on the official servers. The official Champion's Ashes private server can be enabled through the launcher.  
+The Champion's Ashes mod WILL ban you if used on the official servers. The official Champion's Ashes private server can be enabled through the launcher.  
 If you need to disable installing/updating Champion's Ashes, simply delete the Git folder in the files folder present in the launcher folder.  
 Storing mods outside the Game folder requires the launcher to be run with Administrator privileges. Simply right click AshesLauncher4.exe and select run as admin.  
 Private server joiner can be updated by replacing the file 'ChampionsAshesServerJoiner.dll' present in the files folder.
