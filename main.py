@@ -217,7 +217,7 @@ try:
             if private_servers is False:
                 webbrowser.open('steam://rungameid/374320')
             else:
-                gameRunner.join(dir_path + "/DarkSoulsIII.exe")
+                gameRunner.join(bytes(dir_path + "/DarkSoulsIII.exe"))
 
         def launch():
             delete()
@@ -279,7 +279,7 @@ try:
             if private_servers is False:
                 webbrowser.open('steam://rungameid/374320')
             else:
-                gameRunner.join(dir_path + "/DarkSoulsIII.exe")
+                gameRunner.join(bytes(dir_path + "/DarkSoulsIII.exe"))
 
         if git_enabled == 1:
             class CloneProgress(git.RemoteProgress):
