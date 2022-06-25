@@ -624,6 +624,12 @@ try:
             canvas.tag_bind(mod_button, "<Enter>", lambda event: canvas.itemconfig(mod_button, image=disabled_select))
             canvas.tag_bind(mod_button, "<Leave>", lambda event: canvas.itemconfig(mod_button, image=disabled))
             canvas.tag_bind(play_button, "<ButtonPress-1>", play_vanilla)
+            if(mod_name.get() == "Ashes"):
+                canvas.itemconfig(checkbox, image=box)
+                private_servers = False
+                config.set('settings', 'use_private_servers', 'False')
+                with open('settings.ini', 'w+') as file:
+                    config.write(file)
 
         def mod_enabled(event):
             canvas.itemconfig(mod_button, image=enabled)
@@ -631,6 +637,13 @@ try:
             canvas.tag_bind(mod_button, "<Enter>", lambda event: canvas.itemconfig(mod_button, image=enabled_select))
             canvas.tag_bind(mod_button, "<Leave>", lambda event: canvas.itemconfig(mod_button, image=enabled))
             canvas.tag_bind(play_button, "<ButtonPress-1>", play_mod)
+            if(mod_name.get() == "Ashes"):
+                canvas.itemconfig(checkbox, image=tick)
+                private_servers = True
+                config.set('settings', 'use_private_servers', 'True')
+                with open('settings.ini', 'w+') as file:
+                    config.write(file)
+
 
         def preset_vanilla(event):
             if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable VANILLA.cmd") is True:
