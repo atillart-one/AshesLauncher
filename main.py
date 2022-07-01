@@ -365,9 +365,9 @@ try:
                     repo = git.Repo(moddir + "/Ashes")
                     repo.git.fetch('--depth=1')
                     try:
-                        repo.git.merge('-Xtheirs', '--allow-unrelated-histories', '--no-commit', 'origin/master')
+                        repo.git.merge('--ff-only', '--allow-unrelated-histories', 'origin/master')
                     except Exception:
-                        repo.git.merge('--autostash', '--allow-unrelated-histories', '--no-commit', 'origin/master')
+                        repo.git.merge('--autostash', '--ff-only', '--allow-unrelated-histories', 'origin/master')
                         repo.git.stash('drop')
                     canvas.itemconfig(progress, text="")
                     canvas.itemconfig('progress', state='hidden')
@@ -646,8 +646,8 @@ try:
 
 
         def preset_vanilla(event):
-            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable VANILLA.cmd") is True:
-                cmd = subprocess.Popen(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable VANILLA.cmd"),
+            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable_VANILLA.cmd") is True:
+                cmd = subprocess.Popen(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable_VANILLA.cmd"),
                                        cwd=os.path.abspath(moddir + "/Ashes/GraphicPresets"), stdout=subprocess.PIPE,
                                        stdin=subprocess.PIPE)
                 while cmd.poll() is None:
@@ -658,8 +658,8 @@ try:
                 messagebox.showerror("AshesLauncher", "Please install the mod first.")
 
         def preset_default(event):
-            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable PERFORMANCE.cmd") is True:
-                cmd = subprocess.Popen(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable PERFORMANCE.cmd"),
+            if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable_PERFORMANCE.cmd") is True:
+                cmd = subprocess.Popen(os.path.abspath(moddir + "/Ashes/GraphicPresets/Enable_PERFORMANCE.cmd"),
                                        cwd=os.path.abspath(moddir + "/Ashes/GraphicPresets"), stdout=subprocess.PIPE,
                                        stdin=subprocess.PIPE)
                 while cmd.poll() is None:
