@@ -8,3 +8,4 @@ except Exception:
     pass
 
 import launcher
+launcher.main()

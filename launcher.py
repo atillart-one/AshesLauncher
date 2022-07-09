@@ -117,6 +117,16 @@ try:
         config.read('settings.ini')
         dir_path = config['settings']['Directory']
         lastmod = config['settings']['LastMod']
+        moddir = config['settings']['Mods']
+        if os.path.isdir(moddir) is False:
+            moddir = dir_path + '/AshesLauncher'
+        if moddir == '':
+            moddir = dir_path + '/AshesLauncher'
+        if moddir == '/':
+            moddir = dir_path + '/AshesLauncher'
+        if os.path.isfile(moddir + '/DarkSoulsIII.exe') is True:
+            moddir = dir_path + '/AshesLauncher'
+        Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
     else:
         dir_path = os.path.abspath('.')
         lastmod = ''
@@ -165,6 +175,7 @@ try:
 
         check()
         global moddir
+        global dir_path
         config = configparser.ConfigParser()
         config.read('settings.ini')
         moddir = config['settings']['Mods']
@@ -366,7 +377,7 @@ try:
                     canvas.itemconfig(progress, text="")
                     canvas.itemconfig('progress', state='hidden')
                     canvas.itemconfig('proglines', state='hidden')
-                    launch()    
+                    launch()
                     installing = 0
                     canvas.itemconfig(play_button, state='normal')
                     ashes_panel_button1.config(state='normal')
@@ -826,6 +837,7 @@ try:
         mod_button = canvas.create_image(1282, 600, image=disabled, anchor=tkinter.SE, tags='home')
         canvas.create_rectangle(0, 56, 1280, 58, fill='#ba9749', width=0)
 
+        global moddir
         if os.path.isfile(moddir + "/Ashes/_version.txt"):
             version = open(moddir + "/Ashes/_version.txt", 'r').read()
             canvas.create_text(10, 690, text=f"Champion's Ashes Version {version}",
