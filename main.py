@@ -1,7 +1,7 @@
 import requests
 
 try:
-    server_version = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher/version.txt",
+    server_version = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher/main/version.txt",
                                   timeout=3).text
 
     try:
