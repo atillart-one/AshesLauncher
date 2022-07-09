@@ -1,23 +1,23 @@
-import configparser
 import requests
 
-
 try:
-    settings = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher/settings.ini", timeout=3).text
-    config = configparser.ConfigParser()
-    config.read(settings)
-    server_version = config['version']['version']
+    server_version = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher/version.txt",
+                                  timeout=3).text
 
-    config = configparser.ConfigParser()
-    config.read("settings.ini")
-    client_version = config['version']['version']
+    try:
+        client_version = open("version.txt", 'r').read()
+    except Exception:
+        client_version = '0'
 
     if client_version != server_version:
         update = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher"
-                 "/main/launcher.py", timeout=3)
+                              "/main/launcher.py", timeout=3)
         open('launcher.py', 'wb').write(update.content)
+        open("version.txt", 'w').write(server_version)
+
 except Exception:
     pass
 
 import launcher
+launcher.set_game_folder()
 launcher.main()

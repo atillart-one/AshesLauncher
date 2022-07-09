@@ -117,16 +117,6 @@ try:
         config.read('settings.ini')
         dir_path = config['settings']['Directory']
         lastmod = config['settings']['LastMod']
-        moddir = config['settings']['Mods']
-        if os.path.isdir(moddir) is False:
-            moddir = dir_path + '/AshesLauncher'
-        if moddir == '':
-            moddir = dir_path + '/AshesLauncher'
-        if moddir == '/':
-            moddir = dir_path + '/AshesLauncher'
-        if os.path.isfile(moddir + '/DarkSoulsIII.exe') is True:
-            moddir = dir_path + '/AshesLauncher'
-        Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
     else:
         dir_path = os.path.abspath('.')
         lastmod = ''
@@ -840,9 +830,9 @@ try:
         global moddir
         if os.path.isfile(moddir + "/Ashes/_version.txt"):
             version = open(moddir + "/Ashes/_version.txt", 'r').read()
-            canvas.create_text(10, 690, text=f"Champion's Ashes Version {version}",
-                               font=("Friz Quadrata Std", 14),
-                               fill="white", anchor=tkinter.NW, tags='home')
+            canvas.create_text(216, 672, text=f"| Champion's Ashes Version {version}",
+                               font=("Friz Quadrata Std", 14), justify=tkinter.CENTER,
+                               fill='#e4dfd4', anchor=tkinter.NW, tags='home')
 
         canvas.create_image(730, 355, image=discord, tags=('discord', 'home'), anchor=tkinter.NW)
         canvas.create_image(880, 355, image=wiki, tags=('wiki', 'home'), anchor=tkinter.NW)
