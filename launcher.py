@@ -357,6 +357,7 @@ try:
                     b2.config(state='disabled')
 
                     global installing
+                    repo.git.config('--global --add safe.directory ' + moddir + '/Ashes')
                     repo = git.Repo(moddir + "/Ashes")
                     repo.git.fetch('--depth=1')
                     try:
