@@ -573,16 +573,16 @@ try:
                 game_path.set(dir_path)
 
         def browse_mod():
-            config = configparser.ConfigParser()
-            config.read('settings.ini')
             global moddir
-            moddir = config['settings']['Mods']
+            moddir = filedialog.askdirectory()
             if os.path.isdir(moddir) is False:
                 moddir = dir_path + '/AshesLauncher'
             if moddir == '/':
                 moddir = dir_path + '/AshesLauncher'
             if os.path.isfile(moddir + '/DarkSoulsIII.exe') is True:
                 moddir = dir_path + '/AshesLauncher'
+            config = configparser.ConfigParser()
+            config.read('settings.ini')
             config.set('settings', 'Mods', moddir)
             with open('settings.ini', 'w+') as file:
                 config.write(file)
