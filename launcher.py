@@ -180,7 +180,6 @@ try:
         Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
         root.destroy()
 
-
     mod_list = []
     user_list = []
 
@@ -192,11 +191,33 @@ try:
         root.wm_title("AshesLauncher")
         root.geometry(f'1280x720+{int(root.winfo_screenwidth() / 2 - 540)}+{int(root.winfo_screenheight() / 2 - 360)}')
 
+        if not os.path.isfile(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe") and not os.path.isfile(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe"):
+           option = messagebox.askyesno("AshesLauncher", "Could not find 1.15 and 1.15.1 exes. Would you like to download them? You can place them manually in the files" 
+           "folder as DarkSoulsIII-Ashes.exe (1.15) and DarkSoulsIII-Original.exe (1.15.1)."
+           if option:
+            if not os.path.isfile(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe"):
+               response = requests.get(
+                    "https://raw.githubusercontent.com/Atillart-One/AshesLauncher/main/files/DarkSoulsIII-Original.exe", timeout=3)
+                file = open(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe", "wb")
+                file.write(response.content)
+                file.close() 
+            
+            if not os.path.isfile(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe"):
+               response = requests.get(
+                    "https://raw.githubusercontent.com/Atillart-One/AshesLauncher/main/files/DarkSoulsIII-Ashes.exe", timeout=3)
+                file = open(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe", "wb")
+                file.write(response.content)
+                file.close() 
+           else:
+            sys.exit(0)
+
+
         def play_vanilla(event):
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
                 browse()
             else:
+                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe", dir_path + "DarkSoulsIII.exe")
                 vanilla()
 
         def play_mod(event):
@@ -204,10 +225,13 @@ try:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
                 browse()
             elif mod_name.get() == "Ashes":
+                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe", dir_path + "DarkSoulsIII.exe")
                 ashes()
             elif mod_name.get() == "Champions-Ashes-Dev":
+                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe", dir_path + "DarkSoulsIII.exe")
                 ashes_dev()
             else:
+                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe", dir_path + "DarkSoulsIII.exe")
                 launch()
 
         def vanilla():
