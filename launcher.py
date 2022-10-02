@@ -121,6 +121,7 @@ try:
         dir_path = os.path.abspath('.')
         lastmod = ''
 
+
     def onObjectClick(event):
         os.system("taskkill /f /im git.exe")
         sys.exit(0)
@@ -129,6 +130,7 @@ try:
     installing = 0
     private_servers = False
     gameRunner = ctypes.cdll.LoadLibrary('files/ChampionsAshesServerJoiner.dll')
+
 
     def report_callback_exception(self, exc, val, tb):
         messagebox.showerror("Error", message=str(val))
@@ -180,6 +182,7 @@ try:
         Path(moddir + "/Ashes").mkdir(parents=True, exist_ok=True)
         root.destroy()
 
+
     mod_list = []
     user_list = []
 
@@ -191,26 +194,13 @@ try:
         root.wm_title("AshesLauncher")
         root.geometry(f'1280x720+{int(root.winfo_screenwidth() / 2 - 540)}+{int(root.winfo_screenheight() / 2 - 360)}')
 
-        if not os.path.isfile(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe") and not os.path.isfile(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe"):
-           option = messagebox.askyesno("AshesLauncher", "Could not find 1.15 and 1.15.1 exes. Would you like to download them? You can place them manually in the files" 
-           "folder as DarkSoulsIII-Ashes.exe (1.15) and DarkSoulsIII-Original.exe (1.15.1)."
-           if option:
-            if not os.path.isfile(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe"):
-               response = requests.get(
-                    "https://raw.githubusercontent.com/Atillart-One/AshesLauncher/main/files/DarkSoulsIII-Original.exe", timeout=3)
-                file = open(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe", "wb")
-                file.write(response.content)
-                file.close() 
-            
-            if not os.path.isfile(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe"):
-               response = requests.get(
-                    "https://raw.githubusercontent.com/Atillart-One/AshesLauncher/main/files/DarkSoulsIII-Ashes.exe", timeout=3)
-                file = open(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe", "wb")
-                file.write(response.content)
-                file.close() 
-           else:
+        if not os.path.isfile(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe") and not os.path.isfile(
+                os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe"):
+            messagebox.showerror("AshesLauncher",
+                                 'Could not find 1.15 and 1.15.1 exes. You can place them manually in the files'
+                                 'folder as DarkSoulsIII-Ashes.exe (1.15) and DarkSoulsIII-Original.exe ('
+                                 '1.15.1).')
             sys.exit(0)
-
 
         def play_vanilla(event):
             if os.path.isfile(dir_path + "/DarkSoulsIII.exe") is False:
@@ -370,7 +360,6 @@ try:
                             b1.config(state='normal')
                             b2.config(state='normal')
 
-
             def update():
                 try:
                     canvas.itemconfig(play_button, state='disabled')
@@ -429,7 +418,6 @@ try:
                             ashes_panel_button3.config(state='normal')
                             b1.config(state='normal')
                             b2.config(state='normal')
-
 
             def update_dev():
                 try:
@@ -649,7 +637,7 @@ try:
             canvas.tag_bind(mod_button, "<Enter>", lambda event: canvas.itemconfig(mod_button, image=disabled_select))
             canvas.tag_bind(mod_button, "<Leave>", lambda event: canvas.itemconfig(mod_button, image=disabled))
             canvas.tag_bind(play_button, "<ButtonPress-1>", play_vanilla)
-            if(mod_name.get() == "Ashes"):
+            if (mod_name.get() == "Ashes"):
                 canvas.itemconfig(checkbox, image=box)
                 global private_servers
                 private_servers = False
@@ -660,11 +648,10 @@ try:
             canvas.tag_bind(mod_button, "<Enter>", lambda event: canvas.itemconfig(mod_button, image=enabled_select))
             canvas.tag_bind(mod_button, "<Leave>", lambda event: canvas.itemconfig(mod_button, image=enabled))
             canvas.tag_bind(play_button, "<ButtonPress-1>", play_mod)
-            if(mod_name.get() == "Ashes"):
+            if (mod_name.get() == "Ashes"):
                 canvas.itemconfig(checkbox, image=tick)
                 global private_servers
                 private_servers = True
-
 
         def preset_vanilla(event):
             if os.path.isfile(moddir + "/Ashes/GraphicPresets/Enable_VANILLA.cmd") is True:
@@ -826,7 +813,7 @@ try:
             except Exception:
                 return
 
-        s = threading.Thread(target=get_bg,daemon=True)
+        s = threading.Thread(target=get_bg, daemon=True)
         s.start()
         """Main Canvas"""
         canvas.create_image(0, 0, image=bg, anchor=tkinter.NW, tags='background')
