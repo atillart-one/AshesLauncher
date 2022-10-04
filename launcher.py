@@ -371,7 +371,7 @@ try:
 
                     global installing
                     repo = git.Repo(moddir + "/Ashes")
-                    repo.git.config('--global --add safe.directory ' + moddir + '/Ashes')
+                    repo.git.config('--global', '--add', 'safe.directory', moddir + '/Ashes')
                     repo.git.fetch('--depth=1')
                     try:
                         repo.git.merge('--ff-only', '--allow-unrelated-histories', 'origin/master')
