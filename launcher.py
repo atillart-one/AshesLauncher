@@ -207,7 +207,7 @@ try:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
                 browse()
             else:
-                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe", dir_path + "DarkSoulsIII.exe")
+                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe", dir_path + "/DarkSoulsIII.exe")
                 vanilla()
 
         def play_mod(event):
@@ -215,13 +215,13 @@ try:
                 messagebox.showinfo("AshesLauncher", "Please select Game folder.")
                 browse()
             elif mod_name.get() == "Ashes":
-                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe", dir_path + "DarkSoulsIII.exe")
+                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe", dir_path + "/DarkSoulsIII.exe")
                 ashes()
             elif mod_name.get() == "Champions-Ashes-Dev":
-                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe", dir_path + "DarkSoulsIII.exe")
+                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Ashes.exe", dir_path + "/DarkSoulsIII.exe")
                 ashes_dev()
             else:
-                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe", dir_path + "DarkSoulsIII.exe")
+                shutil.copy(os.path.abspath('.') + "/files/DarkSoulsIII-Original.exe", dir_path + "/DarkSoulsIII.exe")
                 launch()
 
         def vanilla():
@@ -371,7 +371,7 @@ try:
 
                     global installing
                     repo = git.Repo(moddir + "/Ashes")
-                    repo.git.config('--global --add safe.directory ' + moddir + '/Ashes')
+                    repo.git.config('--global', '--add', 'safe.directory', moddir + '/Ashes')
                     repo.git.fetch('--depth=1')
                     try:
                         repo.git.merge('--ff-only', '--allow-unrelated-histories', 'origin/master')
