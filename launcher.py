@@ -376,8 +376,8 @@ try:
                     try:
                         repo.git.merge('--ff-only', '--allow-unrelated-histories', 'origin/master')
                     except Exception:
-                        repo.git.merge('--autostash', '--ff-only', '--allow-unrelated-histories', 'origin/master')
-                        repo.git.stash('drop')
+                        reset()
+                        repo.git.merge('--ff-only', '--allow-unrelated-histories', 'origin/master')
                     canvas.itemconfig(progress, text="")
                     canvas.itemconfig('progress', state='hidden')
                     canvas.itemconfig('proglines', state='hidden')
