@@ -340,6 +340,8 @@ try:
                     else:
                         switch = messagebox.askyesno('AshesLauncher', "Launch Game anyways?")
                         if switch is True:
+                            messagebox.showerror('AshesLauncher',
+                                                 "Error for troubleshooting:\n" + traceback.format_exc())
                             launch()
                             installing = 0
                             canvas.itemconfig(play_button, state='normal')
