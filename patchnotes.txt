@@ -1,15 +1,15 @@
-Version 2.3 Summary
+Version 2.4 Summary
 
-New Lantern
-New Dragon Forms
-New Starting Classes 
-New Elden Ring Spells
-New interchangeable WA-system for Twinblades
-Godskin Peeler [ER] 
-Eleonora's Poleblade [ER] 
-Gargoyle's Twinblade [ER] 
-Gargoyle's Blackblade [ER] 
-Twinned Knight Sword [ER] 
-Saw Spear [BB]
-Scarecrow Pitchfork [DkS1]
 Balance and Bug Fixes
+New alternate classes for skeleton and demon
+New and reworked rings
+New consumables 
+New weapons, spells and movesets
+
+PvE
+Added passive poise based on poise stat
+Reworked lothric castle
+Stone Andre 
+Moonlight witch
+Berserk wolves
+Rebalanced most bosses
