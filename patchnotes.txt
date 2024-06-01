@@ -1,15 +1,12 @@
-Version 2.4 Summary
+Version 2.6 Summary
 
-Balance and Bug Fixes
-New alternate classes for skeleton and demon
-New and reworked rings
-New consumables 
-New weapons, spells and movesets
+Extensive changes to movesets and weapon arts, introduces new spells, rings, and consumables, and includes numerous balance adjustments and bug fixes.
 
-PvE
-Added passive poise based on poise stat
-Reworked lothric castle
-Stone Andre 
-Moonlight witch
-Berserk wolves
-Rebalanced most bosses
+Major Changes:
+- New Weapons: Numerous new weapons have been introduced like Chosen Undead's Halberd and Flickering Pyromancy Flame.
+- Moveset and Weapon Art Overhaul: A significant number of movesets and weapon arts have been revamped to add more variety among similar weapons, along with adjustments to existing weapons for balance.
+- New Spells, Rings, and Consumables: Deep Crystal Hail, Imperious Medallion, Contact Medicine, and more have been added.
+- PvE Adjustments: Difficulty was reworked, with adjustments to drop rates and loot.
+- Spell Changes: Existing spells have been tweaked, and new ones like Deep Crystal Hail and Volatile Corruption have been added.
+- Quality of Life Improvements: Cheat shop additions, alternate skins, and infusion options have been included.
+- Bug Fixes: Various issues with weapons, powerstance, and buffs have been addressed.
