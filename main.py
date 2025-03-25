@@ -32,10 +32,12 @@ try:
         client_version = '0'
 
     if client_version != server_version:
-        update = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher"
+        update_launcher = requests.get("https://raw.githubusercontent.com/Atillart-One/AshesLauncher"
                               "/main/launcher.py", timeout=3)
-        open('launcher.py', 'wb').write(update.content)
-        open("version.txt", 'w').write(server_version)
+        update_dll = requests.get("https://github.com/atillart-one/AshesLauncher/raw/refs/heads/main/files/ChampionsAshesServerJoiner.dll", timeout=3)
+        open('launcher.py', 'wb').write(update_launcher.content)
+        open('./files/ChampionsAshesServerJoiner.dll', 'wb').write(update_dll.content)
+        open('version.txt', 'w').write(server_version)
 
 except Exception:
     pass
